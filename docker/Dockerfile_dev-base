@@ -1,0 +1,45 @@
+FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive 
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    lsb-release \
+    sudo \
+    wget \
+    software-properties-common \
+    build-essential  \
+    ccache \
+    g++ \
+    gawk \
+    git \
+    make \
+    cmake \
+    ninja-build \
+    libtool \
+    libxml2-dev \
+    libxslt1-dev \
+    python3-pip \
+    python3-setuptools \
+    python3-numpy \
+    python3-pyparsing \
+    python-is-python3 \
+    libpython3-stdlib \
+    libtool-bin
+
+RUN python -m pip install -U future lxml pexpect
+
+# Cleanup
+RUN apt-get clean \
+	&& apt-get -y autoremove \
+	&& apt-get clean autoclean \
+    && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Set ccache to the PATH
+ENV PATH="/usr/lib/ccache:$PATH"
+
+# Gain some time by disabling mavnative
+ENV DISABLE_MAVNATIVE=True
+
+# Set the buildlogs directory into /tmp as other directory aren't accessible
+ENV BUILDLOGS=/tmp/buildlogs
+
+ENV TZ=UTC

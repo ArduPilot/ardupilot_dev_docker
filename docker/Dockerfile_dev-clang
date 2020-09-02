@@ -1,0 +1,13 @@
+FROM khancyr/ardupilot-dev-base
+
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    clang-7 \
+    llvm-7
+
+# Cleanup
+RUN apt-get clean \
+	&& apt-get -y autoremove \
+	&& apt-get clean autoclean \
+    && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+
