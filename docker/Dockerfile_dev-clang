@@ -4,6 +4,14 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     clang-7 \
     llvm-7
 
+# symlink to compiler versions
+RUN ln -s /usr/bin/clang-7 /usr/bin/clang \
+    && ln -s /usr/bin/clang++-7 /usr/bin/clang++
+
+# configure ccache
+RUN ln -s /usr/bin/ccache /usr/lib/ccache/clang \
+    && ln -s /usr/bin/ccache /usr/lib/ccache/clang++
+
 # Cleanup
 RUN apt-get clean \
 	&& apt-get -y autoremove \
