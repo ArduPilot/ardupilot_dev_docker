@@ -98,7 +98,6 @@ jobs:
         config: [
             clang,
             chibios,
-            chibios-9,
             armhf,
             coverage
         ]

@@ -1,17 +1,33 @@
 FROM khancyr/ardupilot-dev-base
 
 # Get ArduPilot STM32 toolchain
-ARG ARM_ROOT="gcc-arm-none-eabi-6-2017-q2-update"
-ARG ARM_TARBALL="$ARM_ROOT-linux.tar.bz2"
+ARG ARM_ROOT="gcc-arm-none-eabi-6"
+ARG ARM_ROOT_EXT="-2017-q2-update"
+ARG ARM_TARBALL="$ARM_ROOT$ARM_ROOT_EXT-linux.tar.bz2"
 ARG ARM_TARBALL_URL="https://firmware.ardupilot.org/Tools/STM32-tools/$ARM_TARBALL"
 
 RUN mkdir -p /opt && cd /opt \
 	&& wget -qO- "$ARM_TARBALL_URL" | tar jx \
+	&& mv "/opt/$ARM_ROOT$ARM_ROOT_EXT" "/opt/$ARM_ROOT" \
 	&& rm -rf "/opt/$ARM_ROOT/share/doc"
 
 # manual ccache setup for arm-none-eabi-g++/arm-none-eabi-gcc
 RUN ln -s /usr/bin/ccache /usr/lib/ccache/arm-none-eabi-g++ \
 	&& ln -s /usr/bin/ccache /usr/lib/ccache/arm-none-eabi-gcc
+
+# Get STM32 GCC9 toolchain
+ARG ARM_ROOT_NEXT="gcc-arm-none-eabi-9"
+ARG ARM_ROOT_NEXT_EXT="-2020-q2-update"
+ARG ARM_TARBALL_NEXT="$ARM_ROOT_NEXT$ARM_ROOT_NEXT_EXT-x86_64-linux.tar.bz2"
+ARG ARM_TARBALL_URL_NEXT="https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/$ARM_TARBALL_NEXT"
+
+RUN cd /opt \
+	&& wget -qO- "$ARM_TARBALL_URL_NEXT" | tar jx \
+	&& mv "/opt/$ARM_ROOT_NEXT$ARM_ROOT_NEXT_EXT" "/opt/$ARM_ROOT_NEXT" \
+	&& rm -rf "/opt/$ARM_ROOT_NEXT/share/doc"
+
+# Set STM32 NEXT toolchain to the PATH
+ENV PATH="/opt/$ARM_ROOT_NEXT/bin:$PATH"
 
 # Set STM32 toolchain to the PATH
 ENV PATH="/opt/$ARM_ROOT/bin:$PATH"
