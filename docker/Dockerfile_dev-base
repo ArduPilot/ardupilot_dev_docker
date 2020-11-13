@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     python3-setuptools \
     python3-numpy \
     python3-pyparsing \
+    python3-serial \
     python-is-python3 \
     libpython3-stdlib \
     libtool-bin
