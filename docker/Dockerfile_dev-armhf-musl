@@ -1,0 +1,21 @@
+FROM khancyr/ardupilot-dev-armhf
+
+# Get ArduPilot MUSL ARM toolchain
+ARG MUSL_ROOT="arm-linux-musleabihf-cross"
+ARG MUSL_TARBALL="$MUSL_ROOT.tgz"
+ARG MUSL_TARBALL_URL="https://musl.cc/$MUSL_TARBALL"
+
+RUN mkdir -p /opt && cd /opt \
+	&& wget -qO- "$MUSL_TARBALL_URL" | tar zx \
+	&& rm -rf "/opt/$MUSL_ROOT/share/doc"
+
+# manual ccache setup for new toolchain
+RUN ln -s /usr/bin/ccache /usr/lib/ccache/arm-linux-musleabihf-g++ \
+	&& ln -s /usr/bin/ccache /usr/lib/ccache/arm-linux-musleabihf-gcc
+
+# Set MUSL toolchain to the PATH
+ENV PATH="/opt/$MUSL_ROOT/bin:$PATH"
+
+# Set ccache to the PATH
+ENV PATH="/usr/lib/ccache:$PATH"
+
