@@ -19,3 +19,15 @@ Contains Dockerfiles for Docker containers to build and test ArduPilot.
 cd docker
 docker build -t khancyr/ardupilot-dev-base -f Dockerfile_dev-base .
 ```
+
+## Release
+
+Docker images are build with Github Actions. On each PR, they are fresh build from latest source.
+In order to publish them to DockerHub, we need to make a release and tag the image.
+
+## Setting
+
+The repo setting is quite simple, it need Github Action and an account on DockerHub.
+In order to be able to publish the image on DockerHub, you need to set two secrets on your repo setting :
+`DOCKER_USERNAME` and `DOCKER_PASSWORD`
+
