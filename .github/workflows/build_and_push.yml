@@ -32,7 +32,7 @@ jobs:
         name: Prepare
         id: prep
         run: |
-          DOCKER_IMAGE=khancyr/ardupilot-dev-base
+          DOCKER_IMAGE=ardupilot/ardupilot-dev-base
           VERSION=noop
           if [ "${{ github.event_name }}" = "schedule" ]; then
             VERSION=nightly
@@ -134,8 +134,8 @@ jobs:
         name: Prepare
         id: prep
         run: |
-          DOCKER_IMAGE=khancyr/ardupilot-dev-${{matrix.config}}
-          DOCKER_IMAGE_BASE=khancyr/ardupilot-dev-base
+          DOCKER_IMAGE=ardupilot/ardupilot-dev-${{matrix.config}}
+          DOCKER_IMAGE_BASE=ardupilot/ardupilot-dev-base
           VERSION=noop
           if [ "${{ github.event_name }}" = "schedule" ]; then
             VERSION=nightly
@@ -211,5 +211,5 @@ jobs:
       - name: Push ardupilot-dev-${{matrix.config}} images
         if: startsWith(github.ref, 'refs/tags/')
         run:  |
-          docker push khancyr/ardupilot-dev-${{matrix.config}}
+          docker push ardupilot/ardupilot-dev-${{matrix.config}}
 
