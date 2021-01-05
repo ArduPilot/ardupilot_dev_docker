@@ -1,8 +1,18 @@
-# ArduPilot Containers
+# ArduPilot CI Containers
 
-Contains Dockerfiles for Docker containers to build and test ArduPilot.
+Contains Dockerfiles for Docker CI containers to build and test ArduPilot on CI systems like Github Action.
+For daily developpement, you can use the dockerfile provide into ArduPilot directory, see https://ardupilot.org/dev/docs/building-setup-linux.html#id1
 
 ## Container Hierarchy
+
+### Docker Images
+
+The docker images provide base environment to compile ArduPilot. They don't contain ArduPilot code but only the packages needed to compile the binaries. Each image is based on Ubuntu 20.04
+
+The main image is [ardupilot-dev-base ](Dockerfile_dev-base). Other images will inherit from it.
+Each image is specialized to contain only the necessary tools to build the related binaries.
+
+### Images statistics
 
 - [khancyr/ardupilot-dev-base](https://hub.docker.com/r/khancyr/ardupilot-dev-base) [![](https://images.microbadger.com/badges/image/khancyr/ardupilot-dev-base.svg)](http://microbadger.com/images/khancyr/ardupilot-dev-base) [![Docker Size](https://img.shields.io/docker/image-size/khancyr/ardupilot-dev-base/latest)](https://hub.docker.com/r/khancyr/ardupilot-dev-base) [![Docker Pulls](https://img.shields.io/docker/pulls/khancyr/ardupilot-dev-base.svg)](https://hub.docker.com/r/khancyr/ardupilot-dev-base)
 - [khancyr/ardupilot-dev-chibios](https://hub.docker.com/r/khancyr/ardupilot-dev-chibios) [![](https://images.microbadger.com/badges/image/khancyr/ardupilot-dev-chibios.svg)](http://microbadger.com/images/khancyr/ardupilot-dev-chibios) [![Docker Size](https://img.shields.io/docker/image-size/khancyr/ardupilot-dev-chibios/latest)](https://hub.docker.com/r/khancyr/ardupilot-dev-chibios) [![Docker Pulls](https://img.shields.io/docker/pulls/khancyr/ardupilot-dev-chibios.svg)](https://hub.docker.com/r/khancyr/ardupilot-dev-chibios)
