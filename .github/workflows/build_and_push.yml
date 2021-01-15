@@ -101,7 +101,8 @@ jobs:
             chibios-clang,
             armhf,
             armhf-musl,
-            coverage
+            coverage,
+            distccd
         ]
     steps:
       # git checkout the PR

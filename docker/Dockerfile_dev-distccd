@@ -1,0 +1,65 @@
+FROM ubuntu:20.04
+
+LABEL maintainer="Siddharth Bharat Purohit <sidbpurohit@gmail.com>"
+LABEL author="Siddharth Bharat Purohit <sidbpurohit@gmail.com>"
+LABEL description="A distccd image based on Fedora 29 that I use for distributed compilation of ardupilot"
+
+RUN apt-get update && \
+    apt-get install -y \
+    locales
+
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
+    locale-gen
+ENV LANG en_US.UTF-8  
+ENV LANGUAGE en_US:en  
+ENV LC_ALL en_US.UTF-8
+ENV LANG=en_US.utf8
+
+RUN apt-get install -y \
+    distcc \
+    wget
+
+ENV HOME=/home/distcc
+RUN useradd -s /bin/bash distcc
+WORKDIR /home/distcc
+RUN wget -O gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 "https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2?revision=108bd959-44bd-4619-9c19-26187abf5225&la=en&hash=E788CE92E5DFD64B2A8C246BBA91A249CB8E2D2D"
+RUN tar -xvjf gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 
+ENV PATH=/home/distcc/gcc-arm-none-eabi-9-2019-q4-major/bin:$PATH
+RUN echo $PATH
+ENV DISTCC_CMDLIST_NUMWORDS=1
+ENV DISTCC_CMDLIST=/home/distcc/.distcc/DISTCC_CMDLIST
+RUN mkdir /home/distcc/.distcc
+RUN touch /home/distcc/.distcc/DISTCC_CMDLIST
+RUN echo "/home/distcc/gcc-arm-none-eabi-9-2019-q4-major/bin/arm-none-eabi-gcc" > /home/distcc/.distcc/DISTCC_CMDLIST
+RUN echo "/home/distcc/gcc-arm-none-eabi-9-2019-q4-major/bin/arm-none-eabi-g++" >> /home/distcc/.distcc/DISTCC_CMDLIST
+# Define how to start distccd by default
+# (see "man distccd" for more information)
+ENTRYPOINT [\
+  "distccd", \
+  "--daemon", \
+  "--no-detach", \
+  "--user", "distcc", \
+  "--port", "3632", \
+  "--stats", \
+  "--stats-port", "3633", \
+  "--log-stderr", \
+  "--listen", "0.0.0.0"\
+]
+
+CMD [\
+  "--allow", "0.0.0.0/0", \
+  "--nice", "5", \
+  "--jobs", "5" \
+]
+
+# 3632 is the default distccd port
+# 3633 is the default distccd port for getting statistics over HTTP
+EXPOSE \
+  3632/tcp \
+  3633/tcp
+
+# We check the health of the container by checking if the statistics
+# are served. (See
+# https://docs.docker.com/engine/reference/builder/#healthcheck)
+HEALTHCHECK --interval=5m --timeout=3s \
+  CMD curl -f http://0.0.0.0:3633/ || exit 1
