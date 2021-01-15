@@ -32,7 +32,7 @@ jobs:
         name: Prepare
         id: prep
         run: |
-          DOCKER_IMAGE=ardupilot/ardupilot-dev-base
+          DOCKER_IMAGE=${{ secrets.DOCKER_PUSH_NAME }}/ardupilot-dev-base
           VERSION=noop
           if [ "${{ github.event_name }}" = "schedule" ]; then
             VERSION=nightly
@@ -101,7 +101,8 @@ jobs:
             chibios-clang,
             armhf,
             armhf-musl,
-            coverage
+            coverage,
+            distccd
         ]
     steps:
       # git checkout the PR
@@ -134,8 +135,8 @@ jobs:
         name: Prepare
         id: prep
         run: |
-          DOCKER_IMAGE=ardupilot/ardupilot-dev-${{matrix.config}}
-          DOCKER_IMAGE_BASE=ardupilot/ardupilot-dev-base
+          DOCKER_IMAGE=${{ secrets.DOCKER_PUSH_NAME }}/ardupilot-dev-${{matrix.config}}
+          DOCKER_IMAGE_BASE=${{ secrets.DOCKER_PUSH_NAME }}/ardupilot-dev-base
           VERSION=noop
           if [ "${{ github.event_name }}" = "schedule" ]; then
             VERSION=nightly
@@ -211,5 +212,5 @@ jobs:
       - name: Push ardupilot-dev-${{matrix.config}} images
         if: startsWith(github.ref, 'refs/tags/')
         run:  |
-          docker push ardupilot/ardupilot-dev-${{matrix.config}}
+          docker push ${{ secrets.DOCKER_PUSH_NAME }}/ardupilot-dev-${{matrix.config}}
 
