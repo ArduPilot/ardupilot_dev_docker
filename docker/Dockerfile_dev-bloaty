@@ -1,4 +1,4 @@
-FROM khancyr/ardupilot-dev-base
+FROM khancyr/ardupilot-dev-chibios
 
 # Bloaty install
 RUN git clone --recursive https://github.com/google/bloaty.git /tmp/bloaty \
