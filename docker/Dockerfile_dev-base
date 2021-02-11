@@ -23,12 +23,11 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     python3-numpy \
     python3-pyparsing \
     python3-serial \
-    python3-flake8 \
     python-is-python3 \
     libpython3-stdlib \
     libtool-bin
 
-RUN python -m pip install -U future lxml pexpect
+RUN python -m pip install -U future lxml pexpect flake8
 
 # Cleanup
 RUN apt-get clean \
