@@ -1,4 +1,4 @@
-FROM khancyr/ardupilot-dev-armhf
+FROM ardupilot/ardupilot-dev-armhf
 
 # Get ArduPilot MUSL ARM toolchain
 ARG MUSL_ROOT="arm-linux-musleabihf-cross"

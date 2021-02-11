@@ -1,4 +1,4 @@
-FROM khancyr/ardupilot-dev-base
+FROM ardupilot/ardupilot-dev-base
 
 # Get ArduPilot STM32 toolchain
 ARG ARM_ROOT="gcc-arm-none-eabi-6"

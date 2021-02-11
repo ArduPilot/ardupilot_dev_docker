@@ -1,4 +1,4 @@
-FROM khancyr/ardupilot-dev-chibios
+FROM ardupilot/ardupilot-dev-chibios
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
     clang-7 \
