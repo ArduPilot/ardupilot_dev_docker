@@ -12,7 +12,7 @@ The docker images provide base environment to compile ArduPilot. They don't cont
 The main image is [ardupilot-dev-base ](Dockerfile_dev-base). Other images will inherit from it.
 Each image is specialized to contain only the necessary tools to build the related binaries.
 
-### Images statistics
+### Images statistics
 
 - [ardupilot/ardupilot-dev-base](https://hub.docker.com/r/ardupilot/ardupilot-dev-base) [![](https://images.microbadger.com/badges/image/ardupilot/ardupilot-dev-base.svg)](http://microbadger.com/images/ardupilot/ardupilot-dev-base) [![Docker Size](https://img.shields.io/docker/image-size/ardupilot/ardupilot-dev-base/latest)](https://hub.docker.com/r/ardupilot/ardupilot-dev-base) [![Docker Pulls](https://img.shields.io/docker/pulls/ardupilot/ardupilot-dev-base.svg)](https://hub.docker.com/r/ardupilot/ardupilot-dev-base)
 - [ardupilot/ardupilot-dev-chibios](https://hub.docker.com/r/ardupilot/ardupilot-dev-chibios) [![](https://images.microbadger.com/badges/image/ardupilot/ardupilot-dev-chibios.svg)](http://microbadger.com/images/ardupilot/ardupilot-dev-chibios) [![Docker Size](https://img.shields.io/docker/image-size/ardupilot/ardupilot-dev-chibios/latest)](https://hub.docker.com/r/ardupilot/ardupilot-dev-chibios) [![Docker Pulls](https://img.shields.io/docker/pulls/ardupilot/ardupilot-dev-chibios.svg)](https://hub.docker.com/r/ardupilot/ardupilot-dev-chibios)

@@ -16,21 +16,40 @@ RUN ln -s /usr/bin/ccache /usr/lib/ccache/arm-none-eabi-g++ \
 	&& ln -s /usr/bin/ccache /usr/lib/ccache/arm-none-eabi-gcc
 
 # Get STM32 GCC9 toolchain
-ARG ARM_ROOT_NEXT="gcc-arm-none-eabi-9"
-ARG ARM_ROOT_NEXT_EXT="-2020-q2-update"
+ARG ARM_ROOT_NEXT_DEPRECATED="gcc-arm-none-eabi-9"
+ARG ARM_ROOT_NEXT_EXT_DEPRECATED="-2020-q2-update"
+ARG ARM_TARBALL_NEXT_DEPRECATED="$ARM_ROOT_NEXT_DEPRECATED$ARM_ROOT_NEXT_EXT_DEPRECATED-x86_64-linux.tar.bz2"
+ARG ARM_TARBALL_URL_NEXT_DEPRECATED="https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/$ARM_TARBALL_NEXT_DEPRECATED"
+
+RUN cd /opt \
+	&& wget -qO- "$ARM_TARBALL_URL_NEXT_DEPRECATED" | tar jx \
+	&& mv "/opt/$ARM_ROOT_NEXT_DEPRECATED$ARM_ROOT_NEXT_EXT_DEPRECATED" "/opt/$ARM_ROOT_NEXT_DEPRECATED" \
+	&& rm -rf "/opt/$ARM_ROOT_NEXT_DEPRECATED/share/doc"
+
+# Get STM32 GCC10 toolchain
+ARG ARM_ROOT_NEXT="gcc-arm-none-eabi-10"
+ARG ARM_ROOT_NEXT_EXT="-2020-q4-major"
 ARG ARM_TARBALL_NEXT="$ARM_ROOT_NEXT$ARM_ROOT_NEXT_EXT-x86_64-linux.tar.bz2"
-ARG ARM_TARBALL_URL_NEXT="https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/$ARM_TARBALL_NEXT"
+ARG ARM_TARBALL_URL_NEXT="https://firmware.ardupilot.org/Tools/STM32-tools/$ARM_TARBALL_NEXT"
 
 RUN cd /opt \
 	&& wget -qO- "$ARM_TARBALL_URL_NEXT" | tar jx \
 	&& mv "/opt/$ARM_ROOT_NEXT$ARM_ROOT_NEXT_EXT" "/opt/$ARM_ROOT_NEXT" \
 	&& rm -rf "/opt/$ARM_ROOT_NEXT/share/doc"
 
-# Set STM32 NEXT toolchain to the PATH
-ENV PATH="/opt/$ARM_ROOT_NEXT/bin:$PATH"
+# Set STM32 NEXT_DEPRECATED toolchain to the PATH
+ENV PATH="/opt/$ARM_ROOT_NEXT_DEPRECATED/bin:$PATH"
 
 # Set STM32 toolchain to the PATH
 ENV PATH="/opt/$ARM_ROOT/bin:$PATH"
+
+# This is the latest settled so the default one
+# Set STM32 NEXT toolchain to the PATH
+ENV PATH="/opt/$ARM_ROOT_NEXT/bin:$PATH"
+
+RUN mkdir -p $HOME/arm-gcc \
+    && ln -s -f /opt/gcc-arm-none-eabi-10/ g++-10.2.1 \
+    && ln -s -f /opt/gcc-arm-none-eabi-6/ g++-6.3.1
 
 # Set ccache to the PATH
 ENV PATH="/usr/lib/ccache:$PATH"
