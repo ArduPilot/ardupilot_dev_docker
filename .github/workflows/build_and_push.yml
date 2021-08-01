@@ -99,6 +99,7 @@ jobs:
             clang,
             chibios,
             armhf,
+            aarch64,
             coverage
         ]
     steps:
