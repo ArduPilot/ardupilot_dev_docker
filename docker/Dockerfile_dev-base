@@ -25,15 +25,13 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     python3-serial \
     python-is-python3 \
     libpython3-stdlib \
-    libtool-bin
-
-RUN python -m pip install -U future lxml pexpect flake8
-
-# Cleanup
-RUN apt-get clean \
-	&& apt-get -y autoremove \
-	&& apt-get clean autoclean \
+    libtool-bin \
+    && apt-get clean \
+    && apt-get -y autoremove \
+    && apt-get clean autoclean \
     && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    
+RUN python -m pip install -U future lxml pexpect flake8
 
 # Set ccache to the PATH
 ENV PATH="/usr/lib/ccache:$PATH"
