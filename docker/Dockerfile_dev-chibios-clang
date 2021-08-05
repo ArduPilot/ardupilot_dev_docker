@@ -2,7 +2,11 @@ FROM ardupilot/ardupilot-dev-chibios
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
     clang-7 \
-    llvm-7
+    llvm-7 \
+    && apt-get clean \
+    && apt-get -y autoremove \
+    && apt-get clean autoclean \
+    && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # symlink to compiler versions
 RUN ln -s /usr/bin/clang-7 /usr/bin/clang \
@@ -11,9 +15,3 @@ RUN ln -s /usr/bin/clang-7 /usr/bin/clang \
 # configure ccache
 RUN ln -s /usr/bin/ccache /usr/lib/ccache/clang \
     && ln -s /usr/bin/ccache /usr/lib/ccache/clang++
-
-# Cleanup
-RUN apt-get clean \
-	&& apt-get -y autoremove \
-	&& apt-get clean autoclean \
-    && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
