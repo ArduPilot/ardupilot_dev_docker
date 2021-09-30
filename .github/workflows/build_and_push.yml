@@ -184,8 +184,7 @@ jobs:
       matrix:
         config: [
             chibios-clang,
-            armhf-musl,
-            bloaty
+            armhf-musl
         ]
 
     steps:
