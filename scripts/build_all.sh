@@ -13,6 +13,8 @@ echo "BUILDING CHIBIOS"
 docker build -t ardupilot/ardupilot-dev-chibios:latest -f Dockerfile_dev-chibios .
 echo "BUILDING CHIBIOS CLANG"
 docker build -t ardupilot/ardupilot-dev-chibios-clang:latest -f Dockerfile_dev-chibios-clang .
+echo "BUILDING CHIBIOS PY2"
+docker build -t ardupilot/ardupilot-dev-chibios-py2:latest -f Dockerfile_dev-chibios-py2 .
 echo "BUILDING AARCH64"
 docker build -t ardupilot/ardupilot-dev-aarch64:latest -f Dockerfile_dev-aarch64 .
 echo "BUILDING ARMHF"

@@ -15,17 +15,6 @@ RUN mkdir -p /opt && cd /opt \
 RUN ln -s /usr/bin/ccache /usr/lib/ccache/arm-none-eabi-g++ \
 	&& ln -s /usr/bin/ccache /usr/lib/ccache/arm-none-eabi-gcc
 
-# Get STM32 GCC9 toolchain
-ARG ARM_ROOT_NEXT_DEPRECATED="gcc-arm-none-eabi-9"
-ARG ARM_ROOT_NEXT_EXT_DEPRECATED="-2020-q2-update"
-ARG ARM_TARBALL_NEXT_DEPRECATED="$ARM_ROOT_NEXT_DEPRECATED$ARM_ROOT_NEXT_EXT_DEPRECATED-x86_64-linux.tar.bz2"
-ARG ARM_TARBALL_URL_NEXT_DEPRECATED="https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/$ARM_TARBALL_NEXT_DEPRECATED"
-
-RUN cd /opt \
-	&& wget -qO- "$ARM_TARBALL_URL_NEXT_DEPRECATED" | tar jx \
-	&& mv "/opt/$ARM_ROOT_NEXT_DEPRECATED$ARM_ROOT_NEXT_EXT_DEPRECATED" "/opt/$ARM_ROOT_NEXT_DEPRECATED" \
-	&& rm -rf "/opt/$ARM_ROOT_NEXT_DEPRECATED/share/doc"
-
 # Get STM32 GCC10 toolchain
 ARG ARM_ROOT_NEXT="gcc-arm-none-eabi-10"
 ARG ARM_ROOT_NEXT_EXT="-2020-q4-major"
@@ -36,9 +25,6 @@ RUN cd /opt \
 	&& wget -qO- "$ARM_TARBALL_URL_NEXT" | tar jx \
 	&& mv "/opt/$ARM_ROOT_NEXT$ARM_ROOT_NEXT_EXT" "/opt/$ARM_ROOT_NEXT" \
 	&& rm -rf "/opt/$ARM_ROOT_NEXT/share/doc"
-
-# Set STM32 NEXT_DEPRECATED toolchain to the PATH
-ENV PATH="/opt/$ARM_ROOT_NEXT_DEPRECATED/bin:$PATH"
 
 # Set STM32 toolchain to the PATH
 ENV PATH="/opt/$ARM_ROOT/bin:$PATH"
