@@ -104,7 +104,8 @@ jobs:
             chibios,
             armhf,
             aarch64,
-            coverage
+            coverage,
+            chibios-py2
         ]
     steps:
       # git checkout the PR

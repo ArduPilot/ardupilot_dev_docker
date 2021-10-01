@@ -1,0 +1,85 @@
+FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive 
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    lsb-release \
+    sudo \
+    wget \
+    software-properties-common \
+    build-essential  \
+    ccache \
+    g++ \
+    gdb \
+    gawk \
+    git \
+    make \
+    cmake \
+    ninja-build \
+    libtool \
+    libxml2-dev \
+    libxslt1-dev \
+    python-setuptools \
+    python-numpy \
+    python-pyparsing \
+    python-is-python2 \
+    libpython2-stdlib \
+    libtool-bin \
+    && apt-get clean \
+    && apt-get -y autoremove \
+    && apt-get clean autoclean \
+    && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN wget -q https://bootstrap.pypa.io/pip/2.7/get-pip.py && python get-pip.py && rm -f get-pip.py
+RUN python -m pip install --no-cache-dir -U future lxml pexpect flake8 empy pyserial
+
+# Set ccache to the PATH
+ENV PATH="/usr/lib/ccache:$PATH"
+
+# Gain some time by disabling mavnative
+ENV DISABLE_MAVNATIVE=True
+
+# Set the buildlogs directory into /tmp as other directory aren't accessible
+ENV BUILDLOGS=/tmp/buildlogs
+
+ENV TZ=UTC
+
+# Get ArduPilot STM32 toolchain
+ARG ARM_ROOT="gcc-arm-none-eabi-6"
+ARG ARM_ROOT_EXT="-2017-q2-update"
+ARG ARM_TARBALL="$ARM_ROOT$ARM_ROOT_EXT-linux.tar.bz2"
+ARG ARM_TARBALL_URL="https://firmware.ardupilot.org/Tools/STM32-tools/$ARM_TARBALL"
+
+RUN mkdir -p /opt && cd /opt \
+	&& wget -qO- "$ARM_TARBALL_URL" | tar jx \
+	&& mv "/opt/$ARM_ROOT$ARM_ROOT_EXT" "/opt/$ARM_ROOT" \
+	&& rm -rf "/opt/$ARM_ROOT/share/doc"
+
+# manual ccache setup for arm-none-eabi-g++/arm-none-eabi-gcc
+RUN ln -s /usr/bin/ccache /usr/lib/ccache/arm-none-eabi-g++ \
+	&& ln -s /usr/bin/ccache /usr/lib/ccache/arm-none-eabi-gcc
+
+# Get STM32 GCC10 toolchain
+ARG ARM_ROOT_NEXT="gcc-arm-none-eabi-10"
+ARG ARM_ROOT_NEXT_EXT="-2020-q4-major"
+ARG ARM_TARBALL_NEXT="$ARM_ROOT_NEXT$ARM_ROOT_NEXT_EXT-x86_64-linux.tar.bz2"
+ARG ARM_TARBALL_URL_NEXT="https://firmware.ardupilot.org/Tools/STM32-tools/$ARM_TARBALL_NEXT"
+
+RUN cd /opt \
+	&& wget -qO- "$ARM_TARBALL_URL_NEXT" | tar jx \
+	&& mv "/opt/$ARM_ROOT_NEXT$ARM_ROOT_NEXT_EXT" "/opt/$ARM_ROOT_NEXT" \
+	&& rm -rf "/opt/$ARM_ROOT_NEXT/share/doc"
+
+
+# Set STM32 toolchain to the PATH
+ENV PATH="/opt/$ARM_ROOT/bin:$PATH"
+
+# This is the latest settled so the default one
+# Set STM32 NEXT toolchain to the PATH
+ENV PATH="/opt/$ARM_ROOT_NEXT/bin:$PATH"
+
+RUN mkdir -p $HOME/arm-gcc \
+    && ln -s -f /opt/gcc-arm-none-eabi-10/ g++-10.2.1 \
+    && ln -s -f /opt/gcc-arm-none-eabi-6/ g++-6.3.1
+
+# Set ccache to the PATH
+ENV PATH="/usr/lib/ccache:$PATH"
