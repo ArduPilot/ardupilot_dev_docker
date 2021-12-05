@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     python-is-python3 \
     libpython3-stdlib \
     libtool-bin \
+    zip \
     && apt-get clean \
     && apt-get -y autoremove \
     && apt-get clean autoclean \
