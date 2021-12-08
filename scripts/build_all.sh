@@ -23,4 +23,6 @@ echo "BUILDING ARMHF MUSL"
 docker build -t ardupilot/ardupilot-dev-armhf-musl:latest -f Dockerfile_dev-armhf-musl .
 echo "BUILDING COVERAGE"
 docker build -t ardupilot/ardupilot-dev-coverage:latest -f Dockerfile_dev-coverage .
+echo "BUILDING PERIPH"
+docker build -t ardupilot/ardupilot-dev-periph:latest -f Dockerfile_dev-periph .
 popd
