@@ -32,7 +32,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     && apt-get clean autoclean \
     && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN python -m pip install --no-cache-dir -U future lxml pexpect flake8 empy
+RUN python -m pip install --no-cache-dir -U future lxml pexpect flake8 empy pyelftools
 
 # Set ccache to the PATH
 ENV PATH="/usr/lib/ccache:$PATH"
