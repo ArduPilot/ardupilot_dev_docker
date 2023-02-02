@@ -21,11 +21,11 @@ jobs:
 
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
 
       -
         name: Cache Docker layers
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
@@ -58,13 +58,13 @@ jobs:
           elif [ "${{ github.event_name }}" = "push" ]; then
             TAGS="$TAGS,${DOCKER_IMAGE}:sha-${GITHUB_SHA::8}"
           fi
-          echo ::set-output name=version::${VERSION}
-          echo ::set-output name=tags::${TAGS}
-          echo ::set-output name=created::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          echo "{version}=${VERSION}" >> $GITHUB_OUTPUT
+          echo "{tags}=${TAGS}" >> $GITHUB_OUTPUT
+          echo "{created}=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
             
       - name: Login to DockerHub
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -105,8 +105,7 @@ jobs:
             armhf,
             aarch64,
             coverage,
-            chibios-py2,
-            periph
+            chibios-py2
         ]
     steps:
       # git checkout the PR
@@ -114,14 +113,14 @@ jobs:
 
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
         with:
           driver: docker
           driver-opts: network=host
 
       - name: Login to DockerHub
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -156,10 +155,10 @@ jobs:
             TAGS="$TAGS,${DOCKER_IMAGE}:sha-${GITHUB_SHA::8}"
             TAGS_BASE="$TAGS_BASE,${DOCKER_IMAGE_BASE}:sha-${GITHUB_SHA::8}"
           fi
-          echo ::set-output name=version::${VERSION}
-          echo ::set-output name=tags::${TAGS}
-          echo ::set-output name=tags_base::${TAGS_BASE}
-          echo ::set-output name=created::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          echo "{version}=${VERSION}" >> $GITHUB_OUTPUT
+          echo "{tags}=${TAGS}" >> $GITHUB_OUTPUT
+          echo "{tags_base}=${TAGS_BASE}" >> $GITHUB_OUTPUT
+          echo "{created}=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
       # Only push if it comes from tagging
       - name: Build ardupilot-dev-${{matrix.config}} images
@@ -190,7 +189,8 @@ jobs:
       matrix:
         config: [
             chibios-clang,
-            armhf-musl
+            armhf-musl,
+            periph
         ]
 
     steps:
@@ -199,14 +199,14 @@ jobs:
 
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
         with:
           driver: docker
           driver-opts: network=host
 
       - name: Login to DockerHub
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -241,10 +241,10 @@ jobs:
             TAGS="$TAGS,${DOCKER_IMAGE}:sha-${GITHUB_SHA::8}"
             TAGS_BASE="$TAGS_BASE,${DOCKER_IMAGE_BASE}:sha-${GITHUB_SHA::8}"
           fi
-          echo ::set-output name=version::${VERSION}
-          echo ::set-output name=tags::${TAGS}
-          echo ::set-output name=tags_base::${TAGS_BASE}
-          echo ::set-output name=created::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          echo "{version}=${VERSION}" >> $GITHUB_OUTPUT
+          echo "{tags}=${TAGS}" >> $GITHUB_OUTPUT
+          echo "{tags_base}=${TAGS_BASE}" >> $GITHUB_OUTPUT
+          echo "{created}=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
       # Only push if it comes from tagging
       - name: Build ardupilot-dev-${{matrix.config}} images
