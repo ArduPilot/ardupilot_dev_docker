@@ -1,4 +1,4 @@
-FROM ardupilot/ardupilot-dev-base
+FROM ardupilot/ardupilot-dev-coverage
 
 RUN apt-get update && dpkg --add-architecture i386 \
     && apt-get update \
