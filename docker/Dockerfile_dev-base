@@ -38,7 +38,7 @@ RUN apt-get update \
 
 RUN python -m pip install --no-cache-dir -U future lxml pexpect flake8==4.0.1 pycodestyle==2.8.0 empy pyelftools tabulate
 
-RUN mkdir -p /__w/ardupilot/ardupilot && git config --global --add safe.directory /__w/ardupilot/ardupilot && git config --global --add safe.directory '*'
+RUN mkdir -p /__w/ardupilot/ardupilot && git config --global --add safe.directory /__w/ardupilot/ardupilot && git config --system --add safe.directory /__w/ardupilot/ardupilot
 
 # Set ccache to the PATH
 ENV PATH="/usr/lib/ccache:$PATH"
