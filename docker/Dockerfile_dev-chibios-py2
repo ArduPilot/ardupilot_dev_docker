@@ -1,7 +1,11 @@
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive 
-RUN apt-get update && apt-get install --no-install-recommends -y \
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y software-properties-common \
+    && add-apt-repository ppa:git-core/ppa \
+    && apt-get update \
+    && apt-get install --no-install-recommends -y \
     lsb-release \
     sudo \
     wget \
@@ -31,6 +35,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 
 RUN wget -q https://bootstrap.pypa.io/pip/2.7/get-pip.py && python get-pip.py && rm -f get-pip.py
 RUN python -m pip install --no-cache-dir -U future lxml pexpect flake8 pycodestyle empy pyserial
+
+RUN mkdir -p /__w/ardupilot/ardupilot && git config --global --add safe.directory /__w/ardupilot/ardupilot && git config --global --add safe.directory '*'
 
 # Set ccache to the PATH
 ENV PATH="/usr/lib/ccache:$PATH"
