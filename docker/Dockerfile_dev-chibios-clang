@@ -1,8 +1,8 @@
 FROM ardupilot/ardupilot-dev-chibios
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
-    clang-14 \
-    llvm-14 \
+    clang-7 \
+    llvm-7 \
     && apt-get clean \
     && apt-get -y autoremove \
     && apt-get clean autoclean \
