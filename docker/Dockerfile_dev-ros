@@ -1,0 +1,92 @@
+FROM ros:humble-ros-base as main-setup
+
+ENV DEBIAN_FRONTEND=noninteractive 
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    lsb-release \
+    sudo \
+    wget \
+    software-properties-common \
+    build-essential  \
+    ccache \
+    g++ \
+    gdb \
+    gawk \
+    git \
+    make \
+    cmake \
+    ninja-build \
+    libtool \
+    libxml2-dev \
+    libxslt1-dev \
+    python3-pip \
+    python3-setuptools \
+    python3-numpy \
+    python3-pyparsing \
+    python3-serial \
+    python-is-python3 \
+    libpython3-stdlib \
+    libtool-bin \
+    zip \
+    default-jre \
+    socat \
+    ros-dev-tools \
+    && apt-get clean \
+    && apt-get -y autoremove \
+    && apt-get clean autoclean \
+    && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN python -m pip install --no-cache-dir -U future lxml pexpect flake8 empy pyelftools tabulate pymavlink
+
+FROM eclipse-temurin:19-jdk-jammy as dds-gen-builder
+
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    git \
+    && apt-get clean \
+    && apt-get -y autoremove \
+    && apt-get clean autoclean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN git clone -b develop --recurse-submodules https://github.com/ArduPilot/Micro-XRCE-DDS-Gen.git --depth 1 --no-single-branch --branch develop dds-gen \
+    && cd dds-gen \
+    && ./gradlew assemble
+
+FROM main-setup
+
+WORKDIR /dds-gen
+COPY --from=dds-gen-builder /dds-gen/scripts scripts/
+COPY --from=dds-gen-builder /dds-gen/share share/
+WORKDIR /
+
+# Get STM32 GCC10 toolchain
+ARG ARM_ROOT="gcc-arm-none-eabi-10"
+ARG ARM_ROOT_EXT="-2020-q4-major"
+ARG ARM_TARBALL="$ARM_ROOT$ARM_ROOT_EXT-x86_64-linux.tar.bz2"
+ARG ARM_TARBALL_URL="https://firmware.ardupilot.org/Tools/STM32-tools/$ARM_TARBALL"
+
+RUN cd /opt \
+	&& wget -qO- "$ARM_TARBALL_URL" | tar jx \
+	&& mv "/opt/$ARM_ROOT$ARM_ROOT_EXT" "/opt/$ARM_ROOT" \
+	&& rm -rf "/opt/$ARM_ROOT/share/doc"
+
+# manual ccache setup for arm-none-eabi-g++/arm-none-eabi-gcc
+RUN ln -s /usr/bin/ccache /usr/lib/ccache/arm-none-eabi-g++ \
+	&& ln -s /usr/bin/ccache /usr/lib/ccache/arm-none-eabi-gcc
+
+# Set STM32 toolchain to the PATH
+ENV PATH="/opt/$ARM_ROOT/bin:$PATH"
+
+RUN mkdir -p $HOME/arm-gcc \
+    && ln -s -f /opt/gcc-arm-none-eabi-10/ g++-10.2.1
+
+
+ENV PATH="/dds-gen/scripts:$PATH"
+# Set ccache to the PATH
+ENV PATH="/usr/lib/ccache:$PATH"
+
+# Gain some time by disabling mavnative
+ENV DISABLE_MAVNATIVE=True
+
+# Set the buildlogs directory into /tmp as other directory aren't accessible
+ENV BUILDLOGS=/tmp/buildlogs
+
+ENV TZ=UTC
