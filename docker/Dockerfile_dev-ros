@@ -30,6 +30,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     default-jre \
     socat \
     ros-dev-tools \
+    ros-humble-launch-pytest \
     && apt-get clean \
     && apt-get -y autoremove \
     && apt-get clean autoclean \
