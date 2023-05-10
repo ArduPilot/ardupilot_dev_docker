@@ -20,8 +20,7 @@ RUN ln -s /usr/bin/ccache /usr/lib/ccache/arm-none-eabi-g++ \
 ENV PATH="/opt/$ARM_ROOT/bin:$PATH"
 
 
-RUN mkdir -p $HOME/arm-gcc \
-    && ln -s -f /opt/gcc-arm-none-eabi-10/ g++-10.2.1 \
+RUN ln -s -f /opt/gcc-arm-none-eabi-10/ g++-10.2.1
 
 # Set ccache to the PATH
 ENV PATH="/usr/lib/ccache:$PATH"
