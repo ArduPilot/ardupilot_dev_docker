@@ -2,8 +2,8 @@
 FROM ardupilot/ardupilot-dev-base:latest
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
-    clang-7 \
-    llvm-7 \
+    clang-14 \
+    llvm-14 \
     && apt-get clean \
     && apt-get -y autoremove \
     && apt-get clean autoclean \
