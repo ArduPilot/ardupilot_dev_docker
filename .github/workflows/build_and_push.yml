@@ -55,7 +55,6 @@ jobs:
           echo "created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
       - name: Login to DockerHub
-        if: github.event_name != 'pull_request'
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -108,7 +107,6 @@ jobs:
           driver-opts: network=host
 
       - name: Login to DockerHub
-        if: github.event_name != 'pull_request'
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -200,7 +198,6 @@ jobs:
           driver-opts: network=host
 
       - name: Login to DockerHub
-        if: github.event_name != 'pull_request'
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
