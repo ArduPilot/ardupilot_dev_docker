@@ -1,4 +1,5 @@
-FROM ardupilot/ardupilot-dev-armhf
+# syntax=docker/dockerfile:1
+FROM ardupilot/ardupilot-dev-armhf:latest
 
 # Get ArduPilot MUSL ARM toolchain
 ARG MUSL_ROOT="arm-linux-musleabihf-cross"
@@ -18,4 +19,3 @@ ENV PATH="/opt/$MUSL_ROOT/bin:$PATH"
 
 # Set ccache to the PATH
 ENV PATH="/usr/lib/ccache:$PATH"
-

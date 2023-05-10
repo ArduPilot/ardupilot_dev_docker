@@ -1,6 +1,7 @@
+# syntax=docker/dockerfile:1
 FROM ubuntu:20.04
 
-ENV DEBIAN_FRONTEND=noninteractive 
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
     && apt-get install --no-install-recommends -y software-properties-common \
     && add-apt-repository ppa:git-core/ppa \
@@ -34,7 +35,7 @@ RUN apt-get update \
     && apt-get clean \
     && apt-get -y autoremove \
     && apt-get clean autoclean \
-    && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN python -m pip install --no-cache-dir -U future lxml pexpect flake8==4.0.1 pycodestyle==2.8.0 empy pyelftools tabulate pre-commit
 
