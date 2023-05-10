@@ -106,7 +106,7 @@ jobs:
             armhf,
             aarch64,
             coverage,
-            chibios-py2,
+            # chibios-py2, # Deprecated
             ros
         ]
     steps:
