@@ -1,11 +1,8 @@
 # syntax=docker/dockerfile:1
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
-    && apt-get install --no-install-recommends -y software-properties-common \
-    && add-apt-repository ppa:git-core/ppa \
-    && apt-get update \
     && apt-get install --no-install-recommends -y \
     lsb-release \
     sudo \
@@ -37,7 +34,7 @@ RUN apt-get update \
     && apt-get clean autoclean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN python -m pip install --no-cache-dir -U future lxml pexpect flake8==4.0.1 pycodestyle==2.8.0 empy pyelftools tabulate pre-commit
+RUN python -m pip install --no-cache-dir -U future lxml pexpect flake8 pycodestyle empy pyelftools tabulate pre-commit
 
 RUN mkdir -p /__w/ardupilot/ardupilot && git config --global --add safe.directory /__w/ardupilot/ardupilot && git config --system --add safe.directory /__w/ardupilot/ardupilot
 
