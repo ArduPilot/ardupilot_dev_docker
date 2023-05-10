@@ -1,6 +1,7 @@
+# syntax=docker/dockerfile:1
 FROM ros:humble-ros-base as main-setup
 
-ENV DEBIAN_FRONTEND=noninteractive 
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install --no-install-recommends -y \
     lsb-release \
     sudo \
@@ -34,7 +35,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     && apt-get clean \
     && apt-get -y autoremove \
     && apt-get clean autoclean \
-    && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN python -m pip install --no-cache-dir -U future lxml pexpect flake8 empy pyelftools tabulate pymavlink pre-commit
 

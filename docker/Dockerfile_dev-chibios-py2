@@ -1,6 +1,6 @@
 FROM ubuntu:20.04
 
-ENV DEBIAN_FRONTEND=noninteractive 
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
     && apt-get install --no-install-recommends -y software-properties-common \
     && add-apt-repository ppa:git-core/ppa \
@@ -31,7 +31,7 @@ RUN apt-get update \
     && apt-get clean \
     && apt-get -y autoremove \
     && apt-get clean autoclean \
-    && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN wget -q https://bootstrap.pypa.io/pip/2.7/get-pip.py && python get-pip.py && rm -f get-pip.py
 RUN python -m pip install --no-cache-dir -U future lxml pexpect flake8 pycodestyle empy pyserial
