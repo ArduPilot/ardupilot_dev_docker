@@ -30,7 +30,7 @@ RUN apt-get update \
     zip \
     && apt-get clean \
     && apt-get -y autoremove \
-    && apt-get clean autoclean \
+    && apt-get autoclean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # TAKEN from https://github.com/docker-library/python/blob/a58630aef106c8efd710011c6a2a0a1d551319a0/3.11/bullseye/Dockerfile
