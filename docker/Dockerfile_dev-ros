@@ -36,7 +36,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     && apt-get clean autoclean \
     && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN python -m pip install --no-cache-dir -U future lxml pexpect flake8 empy pyelftools tabulate pymavlink
+RUN python -m pip install --no-cache-dir -U future lxml pexpect flake8 empy pyelftools tabulate pymavlink pre-commit
 
 FROM eclipse-temurin:19-jdk-jammy as dds-gen-builder
 
