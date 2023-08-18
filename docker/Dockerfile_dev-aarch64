@@ -7,5 +7,5 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     pkg-config \
     && apt-get clean \
     && apt-get -y autoremove \
-    && apt-get clean autoclean \
+    && apt-get autoclean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

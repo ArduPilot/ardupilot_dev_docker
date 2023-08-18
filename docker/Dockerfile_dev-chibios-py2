@@ -30,7 +30,7 @@ RUN apt-get update \
     libtool-bin \
     && apt-get clean \
     && apt-get -y autoremove \
-    && apt-get clean autoclean \
+    && apt-get autoclean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN wget -q https://bootstrap.pypa.io/pip/2.7/get-pip.py && python get-pip.py && rm -f get-pip.py

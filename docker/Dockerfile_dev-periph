@@ -10,5 +10,5 @@ RUN apt-get update && dpkg --add-architecture i386 \
     iproute2 \
     && apt-get clean \
 	&& apt-get -y autoremove \
-	&& apt-get clean autoclean \
+	&& apt-get autoclean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
