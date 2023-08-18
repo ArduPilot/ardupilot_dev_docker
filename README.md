@@ -7,7 +7,7 @@ For daily developpement, you can use the dockerfile provide into ArduPilot direc
 
 ### Docker Images
 
-The docker images provide base environment to compile ArduPilot. They don't contain ArduPilot code but only the packages needed to compile the binaries. Each image is based on Ubuntu 20.04
+The docker images provide base environment to compile ArduPilot. They don't contain ArduPilot code but only the packages needed to compile the binaries. Each image is based on Ubuntu 20.04 or 22.04.
 
 The main image is [ardupilot-dev-base ](Dockerfile_dev-base). Other images will inherit from it.
 Each image is specialized to contain only the necessary tools to build the related binaries.
