@@ -60,7 +60,7 @@ RUN set -eux; \
 	\
 	pip --version
 
-RUN python -m pip install --no-cache-dir -U future lxml pexpect flake8 pycodestyle empy pyelftools tabulate pre-commit
+RUN python -m pip install --no-cache-dir -U future lxml pexpect flake8 pycodestyle empy pyelftools tabulate pre-commit junitparser
 
 RUN mkdir -p /__w/ardupilot/ardupilot && git config --global --add safe.directory /__w/ardupilot/ardupilot && git config --system --add safe.directory /__w/ardupilot/ardupilot
 
