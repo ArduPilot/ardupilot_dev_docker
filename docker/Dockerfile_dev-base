@@ -20,6 +20,7 @@ RUN apt-get update \
     ninja-build \
     libtool \
     libxml2-dev \
+    libxml2-utils \
     libxslt1-dev \
     python3-numpy \
     python3-pyparsing \
