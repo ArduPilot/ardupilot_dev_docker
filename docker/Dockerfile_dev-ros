@@ -74,7 +74,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     && apt-get autoclean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN git clone -b develop --recurse-submodules https://github.com/ArduPilot/Micro-XRCE-DDS-Gen.git --depth 1 --no-single-branch --branch develop dds-gen \
+RUN git clone -b master --recurse-submodules https://github.com/ArduPilot/Micro-XRCE-DDS-Gen.git --depth 1 --no-single-branch --branch master dds-gen \
     && cd dds-gen \
     && ./gradlew assemble
 
