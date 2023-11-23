@@ -9,8 +9,12 @@ on:
     branches: master
     tags:
       - 'v*.*.*'
+    paths-ignore:
+      - '.github/workflows/ros_nightly.yml'
   pull_request:
     branches: master
+    paths-ignore:
+      - '.github/workflows/ros_nightly.yml'
 
 jobs:
   build-base:
@@ -62,7 +66,7 @@ jobs:
 
       # Only push if it comes from tagging
       - name: Build ardupilot-dev-base images
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: ./
           file: docker/Dockerfile_dev-base
@@ -155,7 +159,7 @@ jobs:
 
       # Only push if it comes from tagging
       - name: Build ardupilot-dev-${{matrix.config}} images
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: ./
           file: docker/Dockerfile_dev-${{matrix.config}}
