@@ -29,6 +29,8 @@ jobs:
           VERSION=noop
           if [ "${{ github.event_name }}" = "schedule" ]; then
             VERSION=nightly
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION=nightly
           elif [[ $GITHUB_REF == refs/tags/* ]]; then
             VERSION=${GITHUB_REF#refs/tags/}
           elif [[ $GITHUB_REF == refs/heads/* ]]; then
