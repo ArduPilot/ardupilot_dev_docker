@@ -20,14 +20,6 @@ jobs:
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      -
-        name: Cache Docker layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
 
       -
         name: Prepare
@@ -67,13 +59,13 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       # Only push if it comes from tagging
-      - name: Build ardupilot-dev-base images
-        uses: docker/build-push-action@v3
+      - name: Build ardupilot-dev-ros images
+        uses: docker/build-push-action@v5
         with:
           context: ./
-          file: docker/Dockerfile_dev-base
+          file: docker/ardupilot-dev-ros
           tags: ${{ steps.prep.outputs.tags }}
-          push: ${{ startsWith(github.ref, 'refs/tags/') }}
+          push: true
           labels: |
             org.opencontainers.image.title=${{ github.event.repository.name }}
             org.opencontainers.image.description=${{ github.event.repository.description }}
@@ -85,6 +77,5 @@ jobs:
             org.opencontainers.image.licenses=${{ github.event.repository.license.spdx_id }}
             org.label-schema.vcs-ref=${{ github.sha }}
             org.label-schema.vcs-url=${{ github.event.repository.clone_url }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: |
-            type=local,dest=/tmp/.buildx-cache
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
