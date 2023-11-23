@@ -49,9 +49,10 @@ jobs:
           elif [ "${{ github.event_name }}" = "push" ]; then
             TAGS="$TAGS,${DOCKER_IMAGE}:sha-${GITHUB_SHA::8}"
           fi
-          echo "{version}=${VERSION}" >> $GITHUB_OUTPUT
-          echo "{tags}=${TAGS}" >> $GITHUB_OUTPUT
-          echo "{created}=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+          echo "img_name=${DOCKER_IMAGE}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tags=${TAGS}" >> "$GITHUB_OUTPUT"
+          echo "created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
 
       - name: Login to DockerHub
         if: github.event_name != 'pull_request'
@@ -69,7 +70,7 @@ jobs:
           tags: ${{ steps.prep.outputs.tags }}
           push: true
           labels: |
-            org.opencontainers.image.title=${{ github.event.repository.name }}
+            org.opencontainers.image.title=${{ steps.prep.outputs.img_name }}
             org.opencontainers.image.description=${{ github.event.repository.description }}
             org.opencontainers.image.url=${{ github.event.repository.html_url }}
             org.opencontainers.image.source=${{ github.event.repository.clone_url }}
