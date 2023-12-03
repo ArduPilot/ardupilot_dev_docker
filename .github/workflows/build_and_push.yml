@@ -59,6 +59,7 @@ jobs:
           echo "created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
       - name: Login to DockerHub
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -71,7 +72,7 @@ jobs:
           context: ./
           file: docker/Dockerfile_dev-base
           tags: ${{ steps.prep.outputs.tags }}
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           labels: |
             org.opencontainers.image.title=${{ steps.prep.outputs.img_name }}
             org.opencontainers.image.description=${{ github.event.repository.name }}
@@ -83,7 +84,8 @@ jobs:
             org.opencontainers.image.licenses=${{ github.event.repository.license.spdx_id }}
             org.label-schema.vcs-ref=${{ github.sha }}
             org.label-schema.vcs-url=${{ github.event.repository.clone_url }}
-
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   build-main-images:
     needs: build-base
@@ -103,14 +105,8 @@ jobs:
       # git checkout the PR
       - uses: actions/checkout@v4
 
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          driver: docker
-          driver-opts: network=host
-
       - name: Login to DockerHub
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -152,7 +148,29 @@ jobs:
           echo "tags_base=${TAGS_BASE}" >> "$GITHUB_OUTPUT"
           echo "created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
 
+      - name: ReBuild ardupilot-dev-base image from cache
+        if: github.event_name == 'pull_request'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./
+          file: docker/Dockerfile_dev-base
+          tags: ardupilot/ardupilot-dev-base:${{ steps.prep.outputs.version }},ardupilot/ardupilot-dev-base:latest
+          push: false
+          load: true
+          labels: |
+            org.opencontainers.image.title=${{ steps.prep.outputs.img_name }}
+            org.opencontainers.image.description=${{ github.event.repository.name }}
+            org.opencontainers.image.url=${{ github.event.repository.html_url }}
+            org.opencontainers.image.source=${{ github.event.repository.clone_url }}
+            org.opencontainers.image.version=${{ steps.prep.outputs.version }}
+            org.opencontainers.image.created=${{ steps.prep.outputs.created }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.licenses=${{ github.event.repository.license.spdx_id }}
+            org.label-schema.vcs-ref=${{ github.sha }}
+            org.label-schema.vcs-url=${{ github.event.repository.clone_url }}
+
       - name: Pull Base Docker image
+        if: github.event_name != 'pull_request'
         run: |
           docker pull ardupilot/ardupilot-dev-base:${{ steps.prep.outputs.version }}
           docker tag ardupilot/ardupilot-dev-base:${{ steps.prep.outputs.version }} ardupilot/ardupilot-dev-base:latest
@@ -164,7 +182,9 @@ jobs:
           context: ./
           file: docker/Dockerfile_dev-${{matrix.config}}
           tags: ${{ steps.prep.outputs.tags }}
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
+          build-args: "TAG=${{ steps.prep.outputs.version }}"
+          pull: false
           labels: |
             org.opencontainers.image.title=${{ steps.prep.outputs.img_name }}
             org.opencontainers.image.description=${{ github.event.repository.name }}
@@ -185,7 +205,7 @@ jobs:
       fail-fast: false  # don't cancel if a job from the matrix fails
       matrix:
         config: [
-            chibios-clang,
+            #chibios-clang,
             armhf-musl,
             periph
         ]
@@ -194,14 +214,8 @@ jobs:
       # git checkout the PR
       - uses: actions/checkout@v4
 
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          driver: docker
-          driver-opts: network=host
-
       - name: Login to DockerHub
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -243,25 +257,15 @@ jobs:
           echo "tags_base=${TAGS_BASE}" >> $GITHUB_OUTPUT
           echo "created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
-      - name: Pull Base Docker image
-        run: |
-          docker pull ardupilot/ardupilot-dev-base:${{ steps.prep.outputs.version }}
-          docker tag ardupilot/ardupilot-dev-base:${{ steps.prep.outputs.version }} ardupilot/ardupilot-dev-base:latest
-          docker pull ardupilot/ardupilot-dev-chibios:${{ steps.prep.outputs.version }}
-          docker tag ardupilot/ardupilot-dev-chibios:${{ steps.prep.outputs.version }} ardupilot/ardupilot-dev-chibios:latest
-          docker pull ardupilot/ardupilot-dev-armhf:${{ steps.prep.outputs.version }}
-          docker tag ardupilot/ardupilot-dev-armhf:${{ steps.prep.outputs.version }} ardupilot/ardupilot-dev-armhf:latest
-          docker pull ardupilot/ardupilot-dev-coverage:${{ steps.prep.outputs.version }}
-          docker tag ardupilot/ardupilot-dev-coverage:${{ steps.prep.outputs.version }} ardupilot/ardupilot-dev-coverage:latest
-
-      # Only push if it comes from tagging
-      - name: Build ardupilot-dev-${{matrix.config}} images
-        uses: docker/build-push-action@v4
+      - name: ReBuild ardupilot-dev-base image from cache
+        if: github.event_name == 'pull_request'
+        uses: docker/build-push-action@v5
         with:
           context: ./
-          file: docker/Dockerfile_dev-${{matrix.config}}
-          tags: ${{ steps.prep.outputs.tags }}
-          push: true
+          file: docker/Dockerfile_dev-base
+          tags: ardupilot/ardupilot-dev-base:${{ steps.prep.outputs.version }},ardupilot/ardupilot-dev-base:latest
+          push: false
+          load: true
           labels: |
             org.opencontainers.image.title=${{ steps.prep.outputs.img_name }}
             org.opencontainers.image.description=${{ github.event.repository.name }}
@@ -274,8 +278,80 @@ jobs:
             org.label-schema.vcs-ref=${{ github.sha }}
             org.label-schema.vcs-url=${{ github.event.repository.clone_url }}
 
-      # separated push action as the build-push-action@v2 don't support push for docker
-      # - name: Push ardupilot-dev-${{matrix.config}} images
-      #   if: startsWith(github.ref, 'refs/tags/')
-      #   run:  |
-      #     docker push ardupilot/ardupilot-dev-${{matrix.config}}
+      - name: ReBuild ardupilot-dev-armhf image from cache
+        if: github.event_name == 'pull_request' && ${{matrix.config}} == "armhf-musl"
+        uses: docker/build-push-action@v5
+        with:
+          context: ./
+          file: docker/Dockerfile_dev-armhf
+          tags: ardupilot/ardupilot-dev-armhf:${{ steps.prep.outputs.version }},ardupilot/ardupilot-dev-armhf:latest
+          build-args: "TAG=${{ steps.prep.outputs.version }}"
+          push: false
+          load: true
+          labels: |
+            org.opencontainers.image.title=${{ steps.prep.outputs.img_name }}
+            org.opencontainers.image.description=${{ github.event.repository.name }}
+            org.opencontainers.image.url=${{ github.event.repository.html_url }}
+            org.opencontainers.image.source=${{ github.event.repository.clone_url }}
+            org.opencontainers.image.version=${{ steps.prep.outputs.version }}
+            org.opencontainers.image.created=${{ steps.prep.outputs.created }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.licenses=${{ github.event.repository.license.spdx_id }}
+            org.label-schema.vcs-ref=${{ github.sha }}
+            org.label-schema.vcs-url=${{ github.event.repository.clone_url }}
+
+      - name: ReBuild ardupilot-dev-coverage image from cache
+        if: github.event_name == 'pull_request' && ${{matrix.config}} == "periph"
+        uses: docker/build-push-action@v5
+        with:
+          context: ./
+          file: docker/Dockerfile_dev-coverage
+          tags: ardupilot/ardupilot-dev-coverage:${{ steps.prep.outputs.version }},ardupilot/ardupilot-dev-coverage:latest
+          build-args: "TAG=${{ steps.prep.outputs.version }}"
+          push: false
+          load: true
+          labels: |
+            org.opencontainers.image.title=${{ steps.prep.outputs.img_name }}
+            org.opencontainers.image.description=${{ github.event.repository.name }}
+            org.opencontainers.image.url=${{ github.event.repository.html_url }}
+            org.opencontainers.image.source=${{ github.event.repository.clone_url }}
+            org.opencontainers.image.version=${{ steps.prep.outputs.version }}
+            org.opencontainers.image.created=${{ steps.prep.outputs.created }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.licenses=${{ github.event.repository.license.spdx_id }}
+            org.label-schema.vcs-ref=${{ github.sha }}
+            org.label-schema.vcs-url=${{ github.event.repository.clone_url }}
+
+      - name: Pull Base Docker image
+        if: github.event_name != 'pull_request' && ${{matrix.config}} == "armhf-musl"
+        run: |
+          docker pull ardupilot/ardupilot-dev-armhf:${{ steps.prep.outputs.version }}
+          docker tag ardupilot/ardupilot-dev-armhf:${{ steps.prep.outputs.version }} ardupilot/ardupilot-dev-armhf:latest
+
+      - name: Pull Base Docker image
+        if: github.event_name != 'pull_request' && ${{matrix.config}} == "periph"
+        run: |
+          docker pull ardupilot/ardupilot-dev-coverage:${{ steps.prep.outputs.version }}
+          docker tag ardupilot/ardupilot-dev-coverage:${{ steps.prep.outputs.version }} ardupilot/ardupilot-dev-coverage:latest
+
+      # Only push if it comes from tagging
+      - name: Build ardupilot-dev-${{matrix.config}} images
+        uses: docker/build-push-action@v4
+        with:
+          context: ./
+          file: docker/Dockerfile_dev-${{matrix.config}}
+          tags: ${{ steps.prep.outputs.tags }}
+          build-args: "TAG=${{ steps.prep.outputs.version }}"
+          push: ${{ github.event_name != 'pull_request' }}
+          pull: false
+          labels: |
+            org.opencontainers.image.title=${{ steps.prep.outputs.img_name }}
+            org.opencontainers.image.description=${{ github.event.repository.name }}
+            org.opencontainers.image.url=${{ github.event.repository.html_url }}
+            org.opencontainers.image.source=${{ github.event.repository.clone_url }}
+            org.opencontainers.image.version=${{ steps.prep.outputs.version }}
+            org.opencontainers.image.created=${{ steps.prep.outputs.created }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.licenses=${{ github.event.repository.license.spdx_id }}
+            org.label-schema.vcs-ref=${{ github.sha }}
+            org.label-schema.vcs-url=${{ github.event.repository.clone_url }}

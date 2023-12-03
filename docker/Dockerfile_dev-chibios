@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1
-FROM ardupilot/ardupilot-dev-base:latest
+ARG TAG="latest"
+FROM ardupilot/ardupilot-dev-base:${TAG}
 
 # Get ArduPilot STM32 toolchain
 ARG ARM_ROOT="gcc-arm-none-eabi-10"
