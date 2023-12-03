@@ -86,7 +86,20 @@ jobs:
             org.label-schema.vcs-url=${{ github.event.repository.clone_url }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
+      # use this on PR to get the image
+      - uses: docker/build-push-action@v5
+        if: github.event_name == 'pull_request'
+        with:
+          context: ./
+          file: docker/Dockerfile_dev-base
+          tags: ${{ steps.prep.outputs.tags }}
+          outputs: type=docker,dest=/tmp/ardupilot_base_${{ steps.prep.outputs.tags }}.tar
+      - name: Upload artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ardupilot_base
+          path: /tmp/ardupilot_base_${{ steps.prep.outputs.tags }}.tar
 
   build-main-images:
     needs: build-base
@@ -156,6 +169,18 @@ jobs:
           echo "tags_base=${TAGS_BASE}" >> "$GITHUB_OUTPUT"
           echo "created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
 
+      - name: Download artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/download-artifact@v3
+        with:
+          name: ardupilot_base
+          path: /tmp/ardupilot_base_${{ steps.prep.outputs.tags }}.tar
+      - name: Load image
+        if: github.event_name == 'pull_request'
+        run: |
+          docker load --input /tmp/ardupilot_base_${{ steps.prep.outputs.tags }}.tar
+          docker image ls -a
+
       - name: Pull Base Docker image
         run: |
           docker pull ardupilot/ardupilot-dev-base:${{ steps.prep.outputs.version }}
@@ -182,6 +207,20 @@ jobs:
             org.label-schema.vcs-url=${{ github.event.repository.clone_url }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      # use this on PR to get the image
+      - uses: docker/build-push-action@v5
+        if: github.event_name == 'pull_request'
+        with:
+          context: ./
+          file: docker/Dockerfile_dev-${{matrix.config}}
+          tags: ${{ steps.prep.outputs.tags }}
+          outputs: type=docker,dest=/tmp/ardupilot_dev_${{matrix.config}}_${{ steps.prep.outputs.tags }}.tar
+      - name: Upload artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ardupilot_dev_${{matrix.config}}
+          path: /tmp/ardupilot_dev_${{matrix.config}}_${{ steps.prep.outputs.tags }}.tar
 
   # those need images from config, so we build them on second step
   build-sub-images:
@@ -191,7 +230,7 @@ jobs:
       fail-fast: false  # don't cancel if a job from the matrix fails
       matrix:
         config: [
-            chibios-clang,
+            #chibios-clang,
             armhf-musl,
             periph
         ]
@@ -250,14 +289,38 @@ jobs:
           echo "tags_base=${TAGS_BASE}" >> $GITHUB_OUTPUT
           echo "created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
-      - name: Pull Base Docker image
+      - name: Download artifact
+        if: github.event_name == 'pull_request' && ${{matrix.config}} == "armhf-musl"
+        uses: actions/download-artifact@v3
+        with:
+          name: ardupilot-dev-armhf
+          path: /tmp/ardupilot-dev-armhf-{{ steps.prep.outputs.tags }}.tar
+      - name: Load image
+        if: github.event_name == 'pull_request' && ${{matrix.config}} == "armhf-musl"
         run: |
-          docker pull ardupilot/ardupilot-dev-base:${{ steps.prep.outputs.version }}
-          docker tag ardupilot/ardupilot-dev-base:${{ steps.prep.outputs.version }} ardupilot/ardupilot-dev-base:latest
-          docker pull ardupilot/ardupilot-dev-chibios:${{ steps.prep.outputs.version }}
-          docker tag ardupilot/ardupilot-dev-chibios:${{ steps.prep.outputs.version }} ardupilot/ardupilot-dev-chibios:latest
+          docker load --input /tmp/ardupilot-dev-armhf-{{ steps.prep.outputs.tags }}.tar
+          docker image ls -a
+      - name: Download artifact
+        if: github.event_name == 'pull_request' && ${{matrix.config}} == "periph"
+        uses: actions/download-artifact@v3
+        with:
+          name: ardupilot-dev-coverage
+          path: /tmp/ardupilot-dev-coverage-{{ steps.prep.outputs.tags }}.tar
+      - name: Load image
+        if: github.event_name == 'pull_request' && ${{matrix.config}} == "periph"
+        run: |
+          docker load --input /tmp/ardupilot-dev-coverage-{{ steps.prep.outputs.tags }}.tar
+          docker image ls -a
+
+      - name: Pull Base Docker image
+        if: ${{matrix.config}} == "armhf-musl"
+        run: |
           docker pull ardupilot/ardupilot-dev-armhf:${{ steps.prep.outputs.version }}
           docker tag ardupilot/ardupilot-dev-armhf:${{ steps.prep.outputs.version }} ardupilot/ardupilot-dev-armhf:latest
+
+      - name: Pull Base Docker image
+        if: ${{matrix.config}} == "periph"
+        run: |
           docker pull ardupilot/ardupilot-dev-coverage:${{ steps.prep.outputs.version }}
           docker tag ardupilot/ardupilot-dev-coverage:${{ steps.prep.outputs.version }} ardupilot/ardupilot-dev-coverage:latest
 
@@ -282,9 +345,3 @@ jobs:
             org.label-schema.vcs-url=${{ github.event.repository.clone_url }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      # separated push action as the build-push-action@v2 don't support push for docker
-      # - name: Push ardupilot-dev-${{matrix.config}} images
-      #   if: startsWith(github.ref, 'refs/tags/')
-      #   run:  |
-      #     docker push ardupilot/ardupilot-dev-${{matrix.config}}
