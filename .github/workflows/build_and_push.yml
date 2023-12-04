@@ -175,7 +175,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ardupilot_base-${{ steps.prep.outputs.version }}
-          path: /tmp/ardupilot_base_${{ steps.prep.outputs.version }}.tar
+          path: /tmp/
       - name: Load image
         if: github.event_name == 'pull_request'
         run: |
@@ -296,7 +296,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ardupilot-dev-armhf-${{ steps.prep.outputs.version }}
-          path: /tmp/ardupilot-dev-armhf-${{ steps.prep.outputs.version }}.tar
+          path: /tmp/
       - name: Load image
         if: github.event_name == 'pull_request' && ${{matrix.config}} == "armhf-musl"
         run: |
@@ -307,7 +307,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ardupilot-dev-coverage-${{ steps.prep.outputs.version }}
-          path: /tmp/ardupilot-dev-coverage-${{ steps.prep.outputs.version }}.tar
+          path: /tmp/
       - name: Load image
         if: github.event_name == 'pull_request' && ${{matrix.config}} == "periph"
         run: |
