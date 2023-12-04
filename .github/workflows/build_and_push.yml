@@ -180,9 +180,11 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           docker load --input /tmp/ardupilot_base_${{ steps.prep.outputs.version }}.tar
+          docker tag ardupilot/ardupilot-dev-base:${{ steps.prep.outputs.version }} ardupilot/ardupilot-dev-base:latest
           docker image ls -a
 
       - name: Pull Base Docker image
+        if: github.event_name != 'pull_request'
         run: |
           docker pull ardupilot/ardupilot-dev-base:${{ steps.prep.outputs.version }}
           docker tag ardupilot/ardupilot-dev-base:${{ steps.prep.outputs.version }} ardupilot/ardupilot-dev-base:latest
@@ -301,6 +303,7 @@ jobs:
         if: github.event_name == 'pull_request' && ${{matrix.config}} == "armhf-musl"
         run: |
           docker load --input /tmp/ardupilot-dev-armhf-${{ steps.prep.outputs.version }}.tar
+          docker tag ardupilot/ardupilot-dev-armhf:${{ steps.prep.outputs.version }} ardupilot/ardupilot-dev-armhf:latest
           docker image ls -a
       - name: Download artifact
         if: github.event_name == 'pull_request' && ${{matrix.config}} == "periph"
@@ -312,16 +315,17 @@ jobs:
         if: github.event_name == 'pull_request' && ${{matrix.config}} == "periph"
         run: |
           docker load --input /tmp/ardupilot-dev-coverage-${{ steps.prep.outputs.version }}.tar
+          docker tag ardupilot/ardupilot-dev-coverage:${{ steps.prep.outputs.version }} ardupilot/ardupilot-dev-coverage:latest
           docker image ls -a
 
       - name: Pull Base Docker image
-        if: ${{matrix.config}} == "armhf-musl"
+        if: github.event_name != 'pull_request' && ${{matrix.config}} == "armhf-musl"
         run: |
           docker pull ardupilot/ardupilot-dev-armhf:${{ steps.prep.outputs.version }}
           docker tag ardupilot/ardupilot-dev-armhf:${{ steps.prep.outputs.version }} ardupilot/ardupilot-dev-armhf:latest
 
       - name: Pull Base Docker image
-        if: ${{matrix.config}} == "periph"
+        if: github.event_name != 'pull_request' && ${{matrix.config}} == "periph"
         run: |
           docker pull ardupilot/ardupilot-dev-coverage:${{ steps.prep.outputs.version }}
           docker tag ardupilot/ardupilot-dev-coverage:${{ steps.prep.outputs.version }} ardupilot/ardupilot-dev-coverage:latest
