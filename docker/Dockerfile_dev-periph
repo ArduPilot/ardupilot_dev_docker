@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1
-FROM ardupilot/ardupilot-dev-coverage:latest
+ARG TAG="latest"
+FROM ardupilot/ardupilot-dev-coverage:${TAG}
 
 RUN apt-get update && dpkg --add-architecture i386 \
     && apt-get update \

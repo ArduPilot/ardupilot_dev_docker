@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1
-FROM ardupilot/ardupilot-dev-armhf:latest
+ARG TAG="latest"
+FROM ardupilot/ardupilot-dev-armhf:${TAG}
 
 # Get ArduPilot MUSL ARM toolchain
 ARG MUSL_ROOT="arm-linux-musleabihf-cross"

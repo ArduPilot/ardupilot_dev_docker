@@ -190,6 +190,7 @@ jobs:
           file: docker/Dockerfile_dev-${{matrix.config}}
           tags: ${{ steps.prep.outputs.tags }}
           push: ${{ github.event_name != 'pull_request' }}
+          build-args: "TAG=${{ steps.prep.outputs.version }}"
           pull: false
           labels: |
             org.opencontainers.image.title=${{ steps.prep.outputs.img_name }}
@@ -293,13 +294,14 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: ReBuild ardupilot-dev-base image from cache
+      - name: ReBuild ardupilot-dev-armhf image from cache
         if: github.event_name == 'pull_request' && ${{matrix.config}} == "armhf-musl"
         uses: docker/build-push-action@v5
         with:
           context: ./
           file: docker/Dockerfile_dev-armhf
           tags: ardupilot/ardupilot-dev-armhf:${{ steps.prep.outputs.version }},ardupilot/ardupilot-dev-armhf:latest
+          build-args: "TAG=${{ steps.prep.outputs.version }}"
           push: false
           load: true
           labels: |
@@ -316,13 +318,14 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: ReBuild ardupilot-dev-base image from cache
+      - name: ReBuild ardupilot-dev-coverage image from cache
         if: github.event_name == 'pull_request' && ${{matrix.config}} == "periph"
         uses: docker/build-push-action@v5
         with:
           context: ./
           file: docker/Dockerfile_dev-coverage
           tags: ardupilot/ardupilot-dev-coverage:${{ steps.prep.outputs.version }},ardupilot/ardupilot-dev-coverage:latest
+          build-args: "TAG=${{ steps.prep.outputs.version }}"
           push: false
           load: true
           labels: |
@@ -358,6 +361,7 @@ jobs:
           context: ./
           file: docker/Dockerfile_dev-${{matrix.config}}
           tags: ${{ steps.prep.outputs.tags }}
+          build-args: "TAG=${{ steps.prep.outputs.version }}"
           push: ${{ github.event_name != 'pull_request' }}
           pull: false
           labels: |

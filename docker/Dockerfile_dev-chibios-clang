@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1
-FROM ardupilot/ardupilot-dev-chibios:latest
+ARG TAG="latest"
+FROM ardupilot/ardupilot-dev-chibios:${TAG}
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
     clang-14 \
