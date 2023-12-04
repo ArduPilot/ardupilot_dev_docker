@@ -196,6 +196,7 @@ jobs:
           file: docker/Dockerfile_dev-${{matrix.config}}
           tags: ${{ steps.prep.outputs.tags }}
           push: ${{ github.event_name != 'pull_request' }}
+          pull: false
           labels: |
             org.opencontainers.image.title=${{ steps.prep.outputs.img_name }}
             org.opencontainers.image.description=${{ github.event.repository.name }}
@@ -335,6 +336,7 @@ jobs:
           file: docker/Dockerfile_dev-${{matrix.config}}
           tags: ${{ steps.prep.outputs.tags }}
           push: ${{ github.event_name != 'pull_request' }}
+          pull: false
           labels: |
             org.opencontainers.image.title=${{ steps.prep.outputs.img_name }}
             org.opencontainers.image.description=${{ github.event.repository.name }}
