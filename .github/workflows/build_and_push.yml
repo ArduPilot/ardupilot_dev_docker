@@ -98,8 +98,9 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v3
         with:
-          name: ardupilot_base
+          name: ardupilot_base-${{ steps.prep.outputs.version }}
           path: /tmp/ardupilot_base_${{ steps.prep.outputs.version }}.tar
+          retention-days: 1
 
   build-main-images:
     needs: build-base
@@ -173,7 +174,7 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: actions/download-artifact@v3
         with:
-          name: ardupilot_base
+          name: ardupilot_base-${{ steps.prep.outputs.version }}
           path: /tmp/ardupilot_base_${{ steps.prep.outputs.version }}.tar
       - name: Load image
         if: github.event_name == 'pull_request'
@@ -219,8 +220,9 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v3
         with:
-          name: ardupilot_dev_${{matrix.config}}
+          name: ardupilot_dev_${{matrix.config}}-${{ steps.prep.outputs.version }}
           path: /tmp/ardupilot_dev_${{matrix.config}}_${{ steps.prep.outputs.version }}.tar
+          retention-days: 1
 
   # those need images from config, so we build them on second step
   build-sub-images:
@@ -293,7 +295,7 @@ jobs:
         if: github.event_name == 'pull_request' && ${{matrix.config}} == "armhf-musl"
         uses: actions/download-artifact@v3
         with:
-          name: ardupilot-dev-armhf
+          name: ardupilot-dev-armhf-${{ steps.prep.outputs.version }}
           path: /tmp/ardupilot-dev-armhf-${{ steps.prep.outputs.version }}.tar
       - name: Load image
         if: github.event_name == 'pull_request' && ${{matrix.config}} == "armhf-musl"
@@ -304,7 +306,7 @@ jobs:
         if: github.event_name == 'pull_request' && ${{matrix.config}} == "periph"
         uses: actions/download-artifact@v3
         with:
-          name: ardupilot-dev-coverage
+          name: ardupilot-dev-coverage-${{ steps.prep.outputs.version }}
           path: /tmp/ardupilot-dev-coverage-${{ steps.prep.outputs.version }}.tar
       - name: Load image
         if: github.event_name == 'pull_request' && ${{matrix.config}} == "periph"
