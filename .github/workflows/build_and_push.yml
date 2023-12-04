@@ -93,13 +93,13 @@ jobs:
           context: ./
           file: docker/Dockerfile_dev-base
           tags: ${{ steps.prep.outputs.tags }}
-          outputs: type=docker,dest=/tmp/ardupilot_base_${{ steps.prep.outputs.tags }}.tar
+          outputs: type=docker,dest=/tmp/ardupilot_base_${{ steps.prep.outputs.version }}.tar
       - name: Upload artifact
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v3
         with:
           name: ardupilot_base
-          path: /tmp/ardupilot_base_${{ steps.prep.outputs.tags }}.tar
+          path: /tmp/ardupilot_base_${{ steps.prep.outputs.version }}.tar
 
   build-main-images:
     needs: build-base
@@ -174,11 +174,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ardupilot_base
-          path: /tmp/ardupilot_base_${{ steps.prep.outputs.tags }}.tar
+          path: /tmp/ardupilot_base_${{ steps.prep.outputs.version }}.tar
       - name: Load image
         if: github.event_name == 'pull_request'
         run: |
-          docker load --input /tmp/ardupilot_base_${{ steps.prep.outputs.tags }}.tar
+          docker load --input /tmp/ardupilot_base_${{ steps.prep.outputs.version }}.tar
           docker image ls -a
 
       - name: Pull Base Docker image
@@ -214,13 +214,13 @@ jobs:
           context: ./
           file: docker/Dockerfile_dev-${{matrix.config}}
           tags: ${{ steps.prep.outputs.tags }}
-          outputs: type=docker,dest=/tmp/ardupilot_dev_${{matrix.config}}_${{ steps.prep.outputs.tags }}.tar
+          outputs: type=docker,dest=/tmp/ardupilot_dev_${{matrix.config}}_${{ steps.prep.outputs.version }}.tar
       - name: Upload artifact
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v3
         with:
           name: ardupilot_dev_${{matrix.config}}
-          path: /tmp/ardupilot_dev_${{matrix.config}}_${{ steps.prep.outputs.tags }}.tar
+          path: /tmp/ardupilot_dev_${{matrix.config}}_${{ steps.prep.outputs.version }}.tar
 
   # those need images from config, so we build them on second step
   build-sub-images:
@@ -294,22 +294,22 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ardupilot-dev-armhf
-          path: /tmp/ardupilot-dev-armhf-{{ steps.prep.outputs.tags }}.tar
+          path: /tmp/ardupilot-dev-armhf-${{ steps.prep.outputs.version }}.tar
       - name: Load image
         if: github.event_name == 'pull_request' && ${{matrix.config}} == "armhf-musl"
         run: |
-          docker load --input /tmp/ardupilot-dev-armhf-{{ steps.prep.outputs.tags }}.tar
+          docker load --input /tmp/ardupilot-dev-armhf-${{ steps.prep.outputs.version }}.tar
           docker image ls -a
       - name: Download artifact
         if: github.event_name == 'pull_request' && ${{matrix.config}} == "periph"
         uses: actions/download-artifact@v3
         with:
           name: ardupilot-dev-coverage
-          path: /tmp/ardupilot-dev-coverage-{{ steps.prep.outputs.tags }}.tar
+          path: /tmp/ardupilot-dev-coverage-${{ steps.prep.outputs.version }}.tar
       - name: Load image
         if: github.event_name == 'pull_request' && ${{matrix.config}} == "periph"
         run: |
-          docker load --input /tmp/ardupilot-dev-coverage-{{ steps.prep.outputs.tags }}.tar
+          docker load --input /tmp/ardupilot-dev-coverage-${{ steps.prep.outputs.version }}.tar
           docker image ls -a
 
       - name: Pull Base Docker image
