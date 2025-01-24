@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1
-FROM ros:humble-ros-base AS main-setup
+ARG ROS_DISTRO=humble
+FROM ros:${ROS_DISTRO}-ros-base AS main-setup
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install --no-install-recommends -y \
@@ -31,7 +32,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     default-jre \
     socat \
     ros-dev-tools \
-    ros-humble-launch-pytest \
+    ros-${ROS_DISTRO}-launch-pytest \
     && apt-get clean \
     && apt-get -y autoremove \
     && apt-get autoclean \
@@ -55,6 +56,7 @@ RUN set -eux; \
 		--disable-pip-version-check \
 		--no-cache-dir \
 		--no-compile \
+        --break-system-packages \
 		"pip==$PYTHON_PIP_VERSION" \
 		"setuptools==$PYTHON_SETUPTOOLS_VERSION" \
 	; \
@@ -62,7 +64,7 @@ RUN set -eux; \
 	\
 	pip --version
 
-RUN python -m pip install --no-cache-dir -U wheel future lxml pexpect flake8 empy==3.3.4 pyelftools tabulate pymavlink pre-commit junitparser
+RUN python -m pip install --no-cache-dir --break-system-packages -U wheel future lxml pexpect flake8 empy==3.3.4 pyelftools tabulate pymavlink pre-commit junitparser
 
 RUN mkdir -p /__w/ardupilot/ardupilot && git config --global --add safe.directory /__w/ardupilot/ardupilot && git config --system --add safe.directory /__w/ardupilot/ardupilot
 
