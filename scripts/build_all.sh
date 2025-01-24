@@ -25,6 +25,8 @@ echo "BUILDING COVERAGE"
 docker build -t ardupilot/ardupilot-dev-coverage:latest -f Dockerfile_dev-coverage .
 echo "BUILDING PERIPH"
 docker build -t ardupilot/ardupilot-dev-periph:latest -f Dockerfile_dev-periph .
-echo "BUILDING ROS2"
-docker build -t ardupilot/ardupilot-dev-ros:latest -f Dockerfile_dev-ros .
+echo "BUILDING ROS2 HUMBLE"
+docker build --build-arg ROS_DISTRO=humble -t ardupilot/ardupilot-dev-ros:humble -f Dockerfile_dev-ros .
+echo "BUILDING ROS2 JAZZY"
+docker build --build-arg ROS_DISTRO=jazzy -t ardupilot/ardupilot-dev-ros:jazzy -f Dockerfile_dev-ros .
 popd
