@@ -3,7 +3,7 @@
 
 repos:
   -   repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v4.4.0
+      rev: v5.0.0
       hooks:
         -   id: trailing-whitespace
         -   id: end-of-file-fixer
@@ -18,3 +18,10 @@ repos:
         -   id: check-shebang-scripts-are-executable
         -   id: check-toml
         -   id: check-xml
+
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        types: [file]
+        files: docker/Dockerfile

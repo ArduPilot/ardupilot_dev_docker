@@ -83,7 +83,7 @@ ENV PATH="/opt/$ARM_ROOT/bin:$PATH"
 # Set STM32 NEXT toolchain to the PATH
 ENV PATH="/opt/$ARM_ROOT_NEXT/bin:$PATH"
 
-RUN mkdir -p $HOME/arm-gcc \
+RUN mkdir -p "$HOME/arm-gcc" \
     && ln -s -f /opt/gcc-arm-none-eabi-10/ g++-10.2.1 \
     && ln -s -f /opt/gcc-arm-none-eabi-6/ g++-6.3.1
 
