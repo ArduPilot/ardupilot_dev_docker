@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM ubuntu:22.04
+FROM ubuntu:22.04 AS base
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
@@ -22,6 +22,7 @@ RUN apt-get update \
     libxml2-dev \
     libxml2-utils \
     libxslt1-dev \
+    openjdk-11-jre-headless \
     python3-numpy \
     python3-pyparsing \
     python3-serial \
@@ -63,8 +64,28 @@ RUN python -m pip install --no-cache-dir -U wheel future lxml pexpect flake8 pyc
 
 RUN mkdir -p /__w/ardupilot/ardupilot && git config --global --add safe.directory /__w/ardupilot/ardupilot && git config --system --add safe.directory /__w/ardupilot/ardupilot
 
+FROM eclipse-temurin:19-jdk-jammy AS dds-gen-builder
+
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    git \
+    && apt-get clean \
+    && apt-get -y autoremove \
+    && apt-get autoclean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN git clone -b master --recurse-submodules https://github.com/ArduPilot/Micro-XRCE-DDS-Gen.git --depth 1 --no-single-branch --branch master dds-gen \
+    && cd dds-gen \
+    && ./gradlew assemble
+
+FROM base
+
+WORKDIR /dds-gen
+COPY --from=dds-gen-builder /dds-gen/scripts scripts/
+COPY --from=dds-gen-builder /dds-gen/share share/
+WORKDIR /
+
 # Set ccache to the PATH
-ENV PATH="/usr/lib/ccache:$PATH"
+ENV PATH="/dds-gen/scripts:/usr/lib/ccache:$PATH"
 
 # Gain some time by disabling mavnative
 ENV DISABLE_MAVNATIVE=True
