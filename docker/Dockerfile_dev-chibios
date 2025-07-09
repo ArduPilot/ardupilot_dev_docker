@@ -13,6 +13,8 @@ RUN mkdir -p /opt && cd /opt \
 	&& mv "/opt/$ARM_ROOT$ARM_ROOT_EXT" "/opt/$ARM_ROOT" \
 	&& rm -rf "/opt/$ARM_ROOT/share/doc"
 
+RUN python -m pip install --no-cache-dir -U intelhex
+
 # manual ccache setup for arm-none-eabi-g++/arm-none-eabi-gcc
 RUN ln -s /usr/bin/ccache /usr/lib/ccache/arm-none-eabi-g++ \
 	&& ln -s /usr/bin/ccache /usr/lib/ccache/arm-none-eabi-gcc
