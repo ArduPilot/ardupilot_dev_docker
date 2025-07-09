@@ -53,16 +53,16 @@ jobs:
             type=sha,format=short
             type=schedule,pattern=nightly
             type=raw,value=latest,enable={{is_default_branch}}
+          labels: |
+            org.opencontainers.image.title=ArduPilot Development Base Image
+            org.opencontainers.image.description=Base development environment for ArduPilot
+            org.opencontainers.image.vendor=ArduPilot.org
             
       - name: Debug metadata outputs
         run: |
           echo "Version: ${{ steps.meta.outputs.version }}"
           echo "Tags: ${{ steps.meta.outputs.tags }}"
           echo "Labels: ${{ steps.meta.outputs.labels }}"
-          labels: |
-            org.opencontainers.image.title=ArduPilot Development Base Image
-            org.opencontainers.image.description=Base development environment for ArduPilot
-            org.opencontainers.image.vendor=ArduPilot.org
 
   build-base:
     runs-on: ubuntu-latest
