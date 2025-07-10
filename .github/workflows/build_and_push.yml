@@ -139,13 +139,9 @@ jobs:
       - name: Build base image for PR builds
         if: github.event_name == 'pull_request'
         run: |
-          # Extract the version/tag that will be used
-          VERSION="${{ needs.metadata.outputs.version }}"
-          
-          # Build base image locally (needed for main images that depend on it)
+          # Build base image locally with simple latest tag
           docker buildx build \
             --file docker/Dockerfile_dev-base \
-            --tag ardupilot/ardupilot-dev-base:${VERSION} \
             --tag ardupilot/ardupilot-dev-base:latest \
             --cache-from type=gha \
             --load \
@@ -185,7 +181,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
           build-args: |
-            TAG=${{ needs.metadata.outputs.version }}
+            TAG=${{ github.event_name == 'pull_request' && 'latest' || needs.metadata.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: ${{ github.event_name != 'pull_request' }}
@@ -221,27 +217,25 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build required parent image for PR builds
+      - name: Build base image for PR builds
         if: github.event_name == 'pull_request'
         run: |
-          # Extract the version/tag that will be used
-          VERSION="${{ needs.metadata.outputs.version }}"
-          
-          # First build the base image locally (needed for parent image)
+          # Build base image locally with simple latest tag (reuse cache from build-base job)
           docker buildx build \
             --file docker/Dockerfile_dev-base \
-            --tag ardupilot/ardupilot-dev-base:${VERSION} \
             --tag ardupilot/ardupilot-dev-base:latest \
             --cache-from type=gha \
             --load \
             .
-          
-          # Then build the specific parent image needed
+
+      - name: Build required parent image for PR builds
+        if: github.event_name == 'pull_request'
+        run: |
+          # Build the specific parent image needed (reusing base from cache)
           docker buildx build \
             --file docker/Dockerfile_dev-${{ matrix.base_image }} \
-            --tag ardupilot/ardupilot-dev-${{ matrix.base_image }}:${VERSION} \
             --tag ardupilot/ardupilot-dev-${{ matrix.base_image }}:latest \
-            --build-arg TAG=${VERSION} \
+            --build-arg TAG=latest \
             --cache-from type=gha \
             --load \
             .
@@ -280,7 +274,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
           build-args: |
-            TAG=${{ needs.metadata.outputs.version }}
+            TAG=${{ github.event_name == 'pull_request' && 'latest' || needs.metadata.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: ${{ github.event_name != 'pull_request' }}
