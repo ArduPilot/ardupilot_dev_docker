@@ -212,7 +212,16 @@ jobs:
           # Extract the version/tag that will be used
           VERSION="${{ needs.metadata.outputs.version }}"
           
-          # Build the specific parent image needed (base image is built in build-base job)
+          # First build the base image locally (needed for parent image)
+          docker buildx build \
+            --file docker/Dockerfile_dev-base \
+            --tag ardupilot/ardupilot-dev-base:${VERSION} \
+            --tag ardupilot/ardupilot-dev-base:latest \
+            --cache-from type=gha \
+            --load \
+            .
+          
+          # Then build the specific parent image needed
           docker buildx build \
             --file docker/Dockerfile_dev-${{ matrix.base_image }} \
             --tag ardupilot/ardupilot-dev-${{ matrix.base_image }}:${VERSION} \
