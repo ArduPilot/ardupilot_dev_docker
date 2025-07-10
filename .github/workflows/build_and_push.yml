@@ -97,7 +97,7 @@ jobs:
           labels: ${{ needs.metadata.outputs.labels }}
           annotations: ${{ needs.metadata.outputs.annotations }}
           cache-from: type=gha
-          cache-to: ${{ github.event_name == 'pull_request' && 'type=cacheonly' || 'type=gha,mode=max' }}
+          cache-to: type=gha,mode=max
           provenance: ${{ github.event_name != 'pull_request' }}
           sbom: ${{ github.event_name != 'pull_request' }}
 
@@ -142,7 +142,7 @@ jobs:
           context: .
           file: docker/Dockerfile_dev-base
           platforms: linux/amd64
-          cache-to: type=cacheonly
+          cache-to: type=gha,mode=max
           tags: |
             ardupilot/ardupilot-dev-base:${{ needs.metadata.outputs.version }}
             ardupilot/ardupilot-dev-base:latest
@@ -183,7 +183,7 @@ jobs:
           build-args: |
             TAG=${{ needs.metadata.outputs.version }}
           cache-from: type=gha
-          cache-to: ${{ github.event_name == 'pull_request' && 'type=cacheonly' || 'type=gha,mode=max' }}
+          cache-to: type=gha,mode=max
           provenance: ${{ github.event_name != 'pull_request' }}
           sbom: ${{ github.event_name != 'pull_request' }}
 
@@ -225,8 +225,9 @@ jobs:
             --file docker/Dockerfile_dev-base \
             --tag ardupilot/ardupilot-dev-base:${{ needs.metadata.outputs.version }} \
             --tag ardupilot/ardupilot-dev-base:latest \
+            --platform linux/amd64 \
             --cache-from type=gha \
-            --load
+            --cache-to type=gha,mode=max \
             .
           
           # Build the specific parent image needed
@@ -234,9 +235,10 @@ jobs:
             --file docker/Dockerfile_dev-${{ matrix.base_image }} \
             --tag ardupilot/ardupilot-dev-${{ matrix.base_image }}:${{ needs.metadata.outputs.version }} \
             --tag ardupilot/ardupilot-dev-${{ matrix.base_image }}:latest \
+            --platform linux/amd64 \
             --build-arg TAG=${{ needs.metadata.outputs.version }} \
             --cache-from type=gha \
-            --load
+            --cache-to type=gha,mode=max \
             .
 
       - name: Generate metadata for ${{ matrix.config }}
@@ -274,7 +276,7 @@ jobs:
           build-args: |
             TAG=${{ needs.metadata.outputs.version }}
           cache-from: type=gha
-          cache-to: ${{ github.event_name == 'pull_request' && 'type=cacheonly' || 'type=gha,mode=max' }}
+          cache-to: type=gha,mode=max
           provenance: ${{ github.event_name != 'pull_request' }}
           sbom: ${{ github.event_name != 'pull_request' }}
 
