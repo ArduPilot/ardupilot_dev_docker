@@ -91,7 +91,6 @@ jobs:
         with:
           context: .
           file: docker/Dockerfile_dev-base
-          platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
           load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ needs.metadata.outputs.tags }}
@@ -99,8 +98,6 @@ jobs:
           annotations: ${{ needs.metadata.outputs.annotations }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          provenance: true
-          sbom: true
 
   # Build main development images that depend on base
   build-main-images:
@@ -112,19 +109,14 @@ jobs:
         include:
           - config: clang
             dockerfile: Dockerfile_dev-clang
-            platforms: linux/amd64
           - config: chibios  
             dockerfile: Dockerfile_dev-chibios
-            platforms: linux/amd64
           - config: armhf
             dockerfile: Dockerfile_dev-armhf
-            platforms: linux/amd64
           - config: aarch64
             dockerfile: Dockerfile_dev-aarch64
-            platforms: linux/amd64
           - config: coverage
             dockerfile: Dockerfile_dev-coverage
-            platforms: linux/amd64
 
     steps:
       - name: Checkout
@@ -147,7 +139,6 @@ jobs:
         with:
           context: .
           file: docker/Dockerfile_dev-base
-          platforms: linux/amd64
           load: true
           tags: |
             ardupilot/ardupilot-dev-base:${{ needs.metadata.outputs.version }}
