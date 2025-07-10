@@ -136,6 +136,21 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Build base image for PR builds
+        if: github.event_name == 'pull_request'
+        run: |
+          # Extract the version/tag that will be used
+          VERSION="${{ needs.metadata.outputs.version }}"
+          
+          # Build base image locally (needed for main images that depend on it)
+          docker buildx build \
+            --file docker/Dockerfile_dev-base \
+            --tag ardupilot/ardupilot-dev-base:${VERSION} \
+            --tag ardupilot/ardupilot-dev-base:latest \
+            --cache-from type=gha \
+            --load \
+            .
+
       - name: Generate metadata for ${{ matrix.config }}
         id: meta
         uses: docker/metadata-action@v5
