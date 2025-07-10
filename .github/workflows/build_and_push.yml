@@ -91,8 +91,9 @@ jobs:
         with:
           context: .
           file: docker/Dockerfile_dev-base
-          platforms: linux/amd64
+          platforms: ${{ github.event_name == 'pull_request' && '' || 'linux/amd64' }}
           push: ${{ github.event_name != 'pull_request' }}
+          load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ needs.metadata.outputs.tags }}
           labels: ${{ needs.metadata.outputs.labels }}
           annotations: ${{ needs.metadata.outputs.annotations }}
@@ -135,19 +136,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build base image for PR builds
-        if: github.event_name == 'pull_request'
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: docker/Dockerfile_dev-base
-          platforms: linux/amd64
-          cache-to: type=gha,mode=max
-          tags: |
-            ardupilot/ardupilot-dev-base:${{ needs.metadata.outputs.version }}
-            ardupilot/ardupilot-dev-base:latest
-          cache-from: type=gha
-
       - name: Generate metadata for ${{ matrix.config }}
         id: meta
         uses: docker/metadata-action@v5
@@ -175,8 +163,9 @@ jobs:
         with:
           context: .
           file: docker/${{ matrix.dockerfile }}
-          platforms: linux/amd64
+          platforms: ${{ github.event_name == 'pull_request' && '' || 'linux/amd64' }}
           push: ${{ github.event_name != 'pull_request' }}
+          load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
@@ -217,28 +206,20 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build required base images for PR builds
+      - name: Build required parent image for PR builds
         if: github.event_name == 'pull_request'
         run: |
-          # Build base image
-          docker buildx build \
-            --file docker/Dockerfile_dev-base \
-            --tag ardupilot/ardupilot-dev-base:${{ needs.metadata.outputs.version }} \
-            --tag ardupilot/ardupilot-dev-base:latest \
-            --platform linux/amd64 \
-            --cache-from type=gha \
-            --cache-to type=gha,mode=max \
-            .
+          # Extract the version/tag that will be used
+          VERSION="${{ needs.metadata.outputs.version }}"
           
-          # Build the specific parent image needed
+          # Build the specific parent image needed (base image is built in build-base job)
           docker buildx build \
             --file docker/Dockerfile_dev-${{ matrix.base_image }} \
-            --tag ardupilot/ardupilot-dev-${{ matrix.base_image }}:${{ needs.metadata.outputs.version }} \
+            --tag ardupilot/ardupilot-dev-${{ matrix.base_image }}:${VERSION} \
             --tag ardupilot/ardupilot-dev-${{ matrix.base_image }}:latest \
-            --platform linux/amd64 \
-            --build-arg TAG=${{ needs.metadata.outputs.version }} \
+            --build-arg TAG=${VERSION} \
             --cache-from type=gha \
-            --cache-to type=gha,mode=max \
+            --load \
             .
 
       - name: Generate metadata for ${{ matrix.config }}
@@ -268,8 +249,9 @@ jobs:
         with:
           context: .
           file: docker/${{ matrix.dockerfile }}
-          platforms: linux/amd64
+          platforms: ${{ github.event_name == 'pull_request' && '' || 'linux/amd64' }}
           push: ${{ github.event_name != 'pull_request' }}
+          load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
