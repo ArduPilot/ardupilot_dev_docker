@@ -93,14 +93,13 @@ jobs:
           file: docker/Dockerfile_dev-base
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
-          load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ needs.metadata.outputs.tags }}
           labels: ${{ needs.metadata.outputs.labels }}
           annotations: ${{ needs.metadata.outputs.annotations }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
-          provenance: true
-          sbom: true
+          cache-to: ${{ github.event_name == 'pull_request' && 'type=cacheonly' || 'type=gha,mode=max' }}
+          provenance: ${{ github.event_name != 'pull_request' }}
+          sbom: ${{ github.event_name != 'pull_request' }}
 
   # Build main development images that depend on base
   build-main-images:
@@ -143,7 +142,7 @@ jobs:
           context: .
           file: docker/Dockerfile_dev-base
           platforms: linux/amd64
-          load: true
+          cache-to: type=cacheonly
           tags: |
             ardupilot/ardupilot-dev-base:${{ needs.metadata.outputs.version }}
             ardupilot/ardupilot-dev-base:latest
@@ -178,16 +177,15 @@ jobs:
           file: docker/${{ matrix.dockerfile }}
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
-          load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
           build-args: |
             TAG=${{ needs.metadata.outputs.version }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
-          provenance: true
-          sbom: true
+          cache-to: ${{ github.event_name == 'pull_request' && 'type=cacheonly' || 'type=gha,mode=max' }}
+          provenance: ${{ github.event_name != 'pull_request' }}
+          sbom: ${{ github.event_name != 'pull_request' }}
 
   # Build images that depend on main images
   build-dependent-images:
@@ -270,16 +268,15 @@ jobs:
           file: docker/${{ matrix.dockerfile }}
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
-          load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
           build-args: |
             TAG=${{ needs.metadata.outputs.version }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
-          provenance: true
-          sbom: true
+          cache-to: ${{ github.event_name == 'pull_request' && 'type=cacheonly' || 'type=gha,mode=max' }}
+          provenance: ${{ github.event_name != 'pull_request' }}
+          sbom: ${{ github.event_name != 'pull_request' }}
 
   # Summary job for status checks
   build-complete:
