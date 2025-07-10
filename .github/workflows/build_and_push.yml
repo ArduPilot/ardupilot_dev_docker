@@ -98,6 +98,8 @@ jobs:
           annotations: ${{ needs.metadata.outputs.annotations }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          provenance: true
+          sbom: true
 
   # Build main development images that depend on base
   build-main-images:
@@ -172,7 +174,6 @@ jobs:
         with:
           context: .
           file: docker/${{ matrix.dockerfile }}
-          platforms: ${{ matrix.platforms }}
           push: ${{ github.event_name != 'pull_request' }}
           load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
@@ -195,11 +196,9 @@ jobs:
         include:
           - config: armhf-musl
             dockerfile: Dockerfile_dev-armhf-musl
-            platforms: linux/amd64
             base_image: armhf
           - config: periph
             dockerfile: Dockerfile_dev-periph
-            platforms: linux/amd64
             base_image: coverage
 
     steps:
@@ -226,7 +225,7 @@ jobs:
             --tag ardupilot/ardupilot-dev-base:${{ needs.metadata.outputs.version }} \
             --tag ardupilot/ardupilot-dev-base:latest \
             --cache-from type=gha \
-            --load \
+            --load
             .
           
           # Build the specific parent image needed
@@ -236,7 +235,7 @@ jobs:
             --tag ardupilot/ardupilot-dev-${{ matrix.base_image }}:latest \
             --build-arg TAG=${{ needs.metadata.outputs.version }} \
             --cache-from type=gha \
-            --load \
+            --load
             .
 
       - name: Generate metadata for ${{ matrix.config }}
@@ -266,7 +265,6 @@ jobs:
         with:
           context: .
           file: docker/${{ matrix.dockerfile }}
-          platforms: ${{ matrix.platforms }}
           push: ${{ github.event_name != 'pull_request' }}
           load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
