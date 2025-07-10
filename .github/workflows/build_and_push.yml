@@ -91,6 +91,7 @@ jobs:
         with:
           context: .
           file: docker/Dockerfile_dev-base
+          platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
           load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ needs.metadata.outputs.tags }}
@@ -141,6 +142,7 @@ jobs:
         with:
           context: .
           file: docker/Dockerfile_dev-base
+          platforms: linux/amd64
           load: true
           tags: |
             ardupilot/ardupilot-dev-base:${{ needs.metadata.outputs.version }}
@@ -174,6 +176,7 @@ jobs:
         with:
           context: .
           file: docker/${{ matrix.dockerfile }}
+          platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
           load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
@@ -265,6 +268,7 @@ jobs:
         with:
           context: .
           file: docker/${{ matrix.dockerfile }}
+          platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
           load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
