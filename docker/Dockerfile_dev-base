@@ -23,6 +23,7 @@ RUN apt-get update \
     libxml2-utils \
     libxslt1-dev \
     openjdk-11-jre-headless \
+    python3-dev \
     python3-numpy \
     python3-pyparsing \
     python3-serial \
