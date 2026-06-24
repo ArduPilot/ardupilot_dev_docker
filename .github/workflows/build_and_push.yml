@@ -80,6 +80,7 @@ jobs:
           echo "base=$(make_tags ${BASE}-base)" >> $GITHUB_OUTPUT
           echo "clang=$(make_tags ${BASE}-clang 1)" >> $GITHUB_OUTPUT
           echo "chibios=$(make_tags ${BASE}-chibios 1)" >> $GITHUB_OUTPUT
+          echo "esp32=$(make_tags ${BASE}-esp32 1)" >> $GITHUB_OUTPUT
           echo "armhf=$(make_tags ${BASE}-armhf 1)" >> $GITHUB_OUTPUT
           echo "aarch64=$(make_tags ${BASE}-aarch64 1)" >> $GITHUB_OUTPUT
           echo "coverage=$(make_tags ${BASE}-coverage 1)" >> $GITHUB_OUTPUT
@@ -143,6 +144,29 @@ jobs:
           pull: false
           labels: |
             org.opencontainers.image.title=ardupilot/ardupilot-dev-chibios
+            org.opencontainers.image.description=${{ github.event.repository.name }}
+            org.opencontainers.image.url=${{ github.event.repository.html_url }}
+            org.opencontainers.image.source=${{ github.event.repository.clone_url }}
+            org.opencontainers.image.version=${{ steps.prep.outputs.version }}
+            org.opencontainers.image.created=${{ steps.prep.outputs.created }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.licenses=${{ github.event.repository.license.spdx_id }}
+            org.label-schema.vcs-ref=${{ github.sha }}
+            org.label-schema.vcs-url=${{ github.event.repository.clone_url }}
+
+      - name: Build ardupilot-dev-esp32
+        uses: docker/build-push-action@v7
+        env:
+          DOCKER_BUILD_SUMMARY: false
+        with:
+          context: ./
+          file: docker/Dockerfile_dev-esp32
+          tags: ${{ steps.tags.outputs.esp32 }}
+          push: ${{ github.event_name != 'pull_request' }}
+          build-args: "TAG=${{ steps.prep.outputs.version }}"
+          pull: false
+          labels: |
+            org.opencontainers.image.title=ardupilot/ardupilot-dev-esp32
             org.opencontainers.image.description=${{ github.event.repository.name }}
             org.opencontainers.image.url=${{ github.event.repository.html_url }}
             org.opencontainers.image.source=${{ github.event.repository.clone_url }}
