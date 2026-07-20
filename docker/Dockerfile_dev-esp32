@@ -35,5 +35,8 @@ RUN git clone -b release/v5.3 https://github.com/espressif/esp-idf.git "$IDF_PAT
     && ./install.sh esp32,esp32s3 \
     && rm -rf "$IDF_TOOLS_PATH/dist"
 
-# Build-time python deps the workflow used to pip-install on every run
-RUN python -m pip install --no-cache-dir -U pymavlink MAVProxy geocoder dronecan "pydantic<2.12"
+# Build-time python deps the workflow used to pip-install on every run.
+# Must go into the IDF venv (install.sh's python_env), not system python:
+# that's the interpreter ardupilot's esp32 build actually uses after sourcing export.sh.
+RUN "$IDF_TOOLS_PATH"/python_env/*/bin/python -m pip install --no-cache-dir -U \
+    pymavlink MAVProxy geocoder dronecan "pydantic<2.12"
